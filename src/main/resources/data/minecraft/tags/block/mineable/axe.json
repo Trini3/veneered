@@ -13,6 +13,10 @@
     "veneer:frame_pressure_plate",
     "veneer:frame_button",
     "veneer:frame_corner",
-    "veneer:frame_corner_slab"
+    "veneer:frame_corner_slab",
+    "veneer:frame_quarter_slab",
+    "veneer:frame_horizontal_quarter",
+    "veneer:frame_vertical_quarter",
+    "veneer:frame_half_stairs"
   ]
 }

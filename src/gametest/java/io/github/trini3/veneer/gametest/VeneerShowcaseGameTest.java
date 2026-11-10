@@ -29,6 +29,9 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 import io.github.trini3.veneer.VeneerRegistry;
 import io.github.trini3.veneer.block.VeneerBlockEntity;
 import io.github.trini3.veneer.block.VeneerCornerBlock;
+import io.github.trini3.veneer.block.VeneerHalfStairBlock;
+import io.github.trini3.veneer.block.VeneerHorizontalQuarterBlock;
+import io.github.trini3.veneer.block.VeneerQuarterSlabBlock;
 import io.github.trini3.veneer.block.VeneerPanelBlock;
 
 /** Builds a showcase of every frame shape (empty, filled, two-tone, connected) and screenshots it. */
@@ -157,6 +160,29 @@ public class VeneerShowcaseGameTest implements FabricClientGameTest {
 			scene.add(new Placement(new BlockPos(28, Y + y, 24), VeneerRegistry.FRAME_CORNER.defaultBlockState().setValue(VeneerCornerBlock.FACING, Direction.WEST), Blocks.BRICKS, Blocks.SPRUCE_PLANKS));
 		}
 
+				// Small shapes: empty at z=24, filled at z=28.
+		BlockState qslab = VeneerRegistry.FRAME_QUARTER_SLAB.defaultBlockState();
+		BlockState hq = VeneerRegistry.FRAME_HORIZONTAL_QUARTER.defaultBlockState().setValue(VeneerHorizontalQuarterBlock.FACING, Direction.EAST);
+		BlockState vq = VeneerRegistry.FRAME_VERTICAL_QUARTER.defaultBlockState();
+		BlockState hs = VeneerRegistry.FRAME_HALF_STAIRS.defaultBlockState();
+		put(0, 24, qslab, null);
+		put(2, 24, hq, null);
+		put(4, 24, hq.setValue(VeneerHorizontalQuarterBlock.DOUBLE, true), null);
+		put(6, 24, vq, null);
+		put(8, 24, hs, null);
+		put(10, 24, hs.setValue(VeneerHalfStairBlock.DOUBLE, true), null);
+
+		put(0, 28, qslab, Blocks.STONE);
+		put(2, 28, qslab.setValue(VeneerQuarterSlabBlock.TOP, true), Blocks.OAK_PLANKS);
+		put(4, 28, hq, Blocks.BRICKS);
+		put(6, 28, hq.setValue(VeneerHorizontalQuarterBlock.DOUBLE, true), Blocks.COBBLESTONE, Blocks.MOSSY_COBBLESTONE);
+		put(8, 28, hq.setValue(VeneerHorizontalQuarterBlock.DOUBLE, true).setValue(VeneerHorizontalQuarterBlock.TOP, true), Blocks.SANDSTONE, Blocks.RED_SANDSTONE);
+		put(10, 28, vq, Blocks.QUARTZ_BLOCK);
+		put(12, 28, hs, Blocks.STONE_BRICKS);
+		put(14, 28, hs.setValue(VeneerHalfStairBlock.LEFT, false), Blocks.OAK_PLANKS);
+		put(16, 28, hs.setValue(VeneerHalfStairBlock.DOUBLE, true), Blocks.STONE_BRICKS, Blocks.OAK_PLANKS);
+		put(18, 28, hs.setValue(VeneerHalfStairBlock.DOUBLE, true).setValue(VeneerHalfStairBlock.TOP, true), Blocks.POLISHED_GRANITE, Blocks.POLISHED_DIORITE);
+
 				try (TestSingleplayerContext sp = context.worldBuilder().create()) {
 			sp.getConnection().waitForChunksRender();
 			sp.getServer().runCommand("gamemode spectator @a");
@@ -206,6 +232,10 @@ public class VeneerShowcaseGameTest implements FabricClientGameTest {
 			shot(context, sp, "showcase_directional_corners", 30, 3, 2, 0, 25);
 			shot(context, sp, "showcase_room_corner_outside", 32.5, 3, 28.5, 135, 20);
 			shot(context, sp, "showcase_room_corner_inside", 25, 2.5, 21, -45, 15);
+
+			shot(context, sp, "showcase_small_shapes_empty", 5.5, 3, 20.5, 0, 30);
+			shot(context, sp, "showcase_small_shapes_left", 5.5, 3, 32.5, 180, 30);
+			shot(context, sp, "showcase_small_shapes_right", 14.5, 3, 32.5, 180, 30);
 
 			sp.getServer().runCommand("time set midnight");
 			context.waitTicks(20);

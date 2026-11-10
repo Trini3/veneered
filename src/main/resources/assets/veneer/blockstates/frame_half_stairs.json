@@ -1,0 +1,124 @@
+{
+  "variants": {
+    "double=false,facing=north,left=false,top=false": {
+      "model": "veneer:block/frame_half_stairs_bottom_right"
+    },
+    "double=false,facing=north,left=false,top=true": {
+      "model": "veneer:block/frame_half_stairs_top_right"
+    },
+    "double=false,facing=north,left=true,top=false": {
+      "model": "veneer:block/frame_half_stairs_bottom_left"
+    },
+    "double=false,facing=north,left=true,top=true": {
+      "model": "veneer:block/frame_half_stairs_top_left"
+    },
+    "double=true,facing=north,left=false,top=false": {
+      "model": "veneer:block/frame_half_stairs_double_bottom"
+    },
+    "double=true,facing=north,left=false,top=true": {
+      "model": "veneer:block/frame_half_stairs_double_top"
+    },
+    "double=true,facing=north,left=true,top=false": {
+      "model": "veneer:block/frame_half_stairs_double_bottom"
+    },
+    "double=true,facing=north,left=true,top=true": {
+      "model": "veneer:block/frame_half_stairs_double_top"
+    },
+    "double=false,facing=east,left=false,top=false": {
+      "model": "veneer:block/frame_half_stairs_bottom_right",
+      "y": 90
+    },
+    "double=false,facing=east,left=false,top=true": {
+      "model": "veneer:block/frame_half_stairs_top_right",
+      "y": 90
+    },
+    "double=false,facing=east,left=true,top=false": {
+      "model": "veneer:block/frame_half_stairs_bottom_left",
+      "y": 90
+    },
+    "double=false,facing=east,left=true,top=true": {
+      "model": "veneer:block/frame_half_stairs_top_left",
+      "y": 90
+    },
+    "double=true,facing=east,left=false,top=false": {
+      "model": "veneer:block/frame_half_stairs_double_bottom",
+      "y": 90
+    },
+    "double=true,facing=east,left=false,top=true": {
+      "model": "veneer:block/frame_half_stairs_double_top",
+      "y": 90
+    },
+    "double=true,facing=east,left=true,top=false": {
+      "model": "veneer:block/frame_half_stairs_double_bottom",
+      "y": 90
+    },
+    "double=true,facing=east,left=true,top=true": {
+      "model": "veneer:block/frame_half_stairs_double_top",
+      "y": 90
+    },
+    "double=false,facing=south,left=false,top=false": {
+      "model": "veneer:block/frame_half_stairs_bottom_right",
+      "y": 180
+    },
+    "double=false,facing=south,left=false,top=true": {
+      "model": "veneer:block/frame_half_stairs_top_right",
+      "y": 180
+    },
+    "double=false,facing=south,left=true,top=false": {
+      "model": "veneer:block/frame_half_stairs_bottom_left",
+      "y": 180
+    },
+    "double=false,facing=south,left=true,top=true": {
+      "model": "veneer:block/frame_half_stairs_top_left",
+      "y": 180
+    },
+    "double=true,facing=south,left=false,top=false": {
+      "model": "veneer:block/frame_half_stairs_double_bottom",
+      "y": 180
+    },
+    "double=true,facing=south,left=false,top=true": {
+      "model": "veneer:block/frame_half_stairs_double_top",
+      "y": 180
+    },
+    "double=true,facing=south,left=true,top=false": {
+      "model": "veneer:block/frame_half_stairs_double_bottom",
+      "y": 180
+    },
+    "double=true,facing=south,left=true,top=true": {
+      "model": "veneer:block/frame_half_stairs_double_top",
+      "y": 180
+    },
+    "double=false,facing=west,left=false,top=false": {
+      "model": "veneer:block/frame_half_stairs_bottom_right",
+      "y": 270
+    },
+    "double=false,facing=west,left=false,top=true": {
+      "model": "veneer:block/frame_half_stairs_top_right",
+      "y": 270
+    },
+    "double=false,facing=west,left=true,top=false": {
+      "model": "veneer:block/frame_half_stairs_bottom_left",
+      "y": 270
+    },
+    "double=false,facing=west,left=true,top=true": {
+      "model": "veneer:block/frame_half_stairs_top_left",
+      "y": 270
+    },
+    "double=true,facing=west,left=false,top=false": {
+      "model": "veneer:block/frame_half_stairs_double_bottom",
+      "y": 270
+    },
+    "double=true,facing=west,left=false,top=true": {
+      "model": "veneer:block/frame_half_stairs_double_top",
+      "y": 270
+    },
+    "double=true,facing=west,left=true,top=false": {
+      "model": "veneer:block/frame_half_stairs_double_bottom",
+      "y": 270
+    },
+    "double=true,facing=west,left=true,top=true": {
+      "model": "veneer:block/frame_half_stairs_double_top",
+      "y": 270
+    }
+  }
+}

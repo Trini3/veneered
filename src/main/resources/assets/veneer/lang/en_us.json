@@ -12,5 +12,9 @@
   "block.veneer.frame_button": "Frame Button",
   "itemGroup.veneer.frames": "Veneer Frames",
   "block.veneer.frame_corner": "Frame Corner Block",
-  "block.veneer.frame_corner_slab": "Frame Corner Slab"
+  "block.veneer.frame_corner_slab": "Frame Corner Slab",
+  "block.veneer.frame_quarter_slab": "Frame Quarter Slab",
+  "block.veneer.frame_horizontal_quarter": "Frame Horizontal Quarter",
+  "block.veneer.frame_vertical_quarter": "Frame Vertical Quarter",
+  "block.veneer.frame_half_stairs": "Frame Half Stairs"
 }

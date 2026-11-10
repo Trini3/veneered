@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "top=false": {
+      "model": "veneer:block/frame_quarter_slab"
+    },
+    "top=true": {
+      "model": "veneer:block/frame_quarter_slab_top"
+    }
+  }
+}

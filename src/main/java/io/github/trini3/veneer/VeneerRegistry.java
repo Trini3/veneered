@@ -37,6 +37,10 @@ public final class VeneerRegistry {
 	public static final Block FRAME_STAIRS = register("frame_stairs", p -> new VeneerStairBlock(Blocks.OAK_PLANKS.defaultBlockState(), p), solidProps(Blocks.OAK_STAIRS));
 	public static final Block FRAME_CORNER = register("frame_corner", VeneerCornerBlock::block, solidProps(Blocks.OAK_PLANKS));
 	public static final Block FRAME_CORNER_SLAB = register("frame_corner_slab", VeneerCornerBlock::slab, solidProps(Blocks.OAK_SLAB));
+	public static final Block FRAME_QUARTER_SLAB = register("frame_quarter_slab", VeneerQuarterSlabBlock::new, solidProps(Blocks.OAK_SLAB));
+	public static final Block FRAME_HORIZONTAL_QUARTER = register("frame_horizontal_quarter", VeneerHorizontalQuarterBlock::new, solidProps(Blocks.OAK_SLAB));
+	public static final Block FRAME_VERTICAL_QUARTER = register("frame_vertical_quarter", VeneerVerticalQuarterBlock::new, solidProps(Blocks.OAK_SLAB));
+	public static final Block FRAME_HALF_STAIRS = register("frame_half_stairs", VeneerHalfStairBlock::new, solidProps(Blocks.OAK_STAIRS));
 	public static final Block FRAME_WALL = register("frame_wall", VeneerWallBlock::new, props(Blocks.OAK_PLANKS).forceSolidOn());
 	public static final Block FRAME_FENCE = register("frame_fence", VeneerFenceBlock::new, props(Blocks.OAK_FENCE));
 	public static final Block FRAME_FENCE_GATE = register("frame_fence_gate", p -> new VeneerFenceGateBlock(WoodType.OAK, p), props(Blocks.OAK_FENCE_GATE));

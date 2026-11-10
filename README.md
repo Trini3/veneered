@@ -5,7 +5,7 @@ Make dirt doors, grass walls, glass stairs, or a slab that is half stone and hal
 
 ## How it works
 
-- Craft a **Frame Block** (8 from sticks and planks), then craft it into the other shapes.
+- Craft **16 Frame Blocks** from 8 sticks around one plank. Put a frame block in a **stonecutter** to get any shape, or craft the usual shapes (slabs, stairs, walls, fences, gates, doors, trapdoors, pressure plates, buttons) with their normal vanilla patterns.
 - **Right-click a frame with a block** to make the frame look like that block. The block is used up and given back when you change or remove it.
 - **Sneak + right-click with an empty hand** to take the block back out.
 - Breaking a frame drops the empty frame and the blocks that were inside as separate items.
@@ -18,13 +18,15 @@ Make dirt doors, grass walls, glass stairs, or a slab that is half stone and hal
 
 ### Shapes
 
-Frame Block, Slab, Vertical Slab, Corner Block, Corner Slab, Stairs, Wall, Fence, Fence Gate, Door, Trapdoor, Pressure Plate, Button.
+Frame Block, Slab, Vertical Slab, Corner Block, Corner Slab, Quarter Slab (a quarter-height layer), Horizontal Quarter (half a slab), Vertical Quarter (a quarter-block pillar), Stairs, Half Stairs, Wall, Fence, Fence Gate, Door, Trapdoor, Pressure Plate, Button.
 
 ### Two-tone blocks
 
 - **Slabs**: place a frame slab on top of another. Each half keeps its own look, so you can have stone on the bottom and planks on top. Right-click the half you want to change.
 - **Vertical slabs**: place a second frame vertical slab against the open side of the first (the vertical half-and-half block). The two halves keep separate looks, which gives walls with a different inside and outside.
 
+- **Half-and-half slabs**: place a second horizontal quarter into the empty half of the first. The slab is split down the middle with a different block on each side.
+- **Half-and-half stairs**: place a second half stairs into the empty half of the first.
 - **Corner blocks and corner slabs**: split 3/4 and 1/4, with the small quarter pointing toward you when you place it. Stand inside the room when placing a corner and the quarter lands on the inside corner, so it lines up with two-tone vertical-slab walls (outside look in the L, inside look in the quarter).
 
 Directional blocks keep the orientation they'd get if you placed them normally: a log follows the face you click, a furnace or pumpkin faces you. Right-click again with the same block to re-orient it without using another item.
@@ -49,25 +51,6 @@ Requires JDK 25.
 
 ## Recipes
 
-| Item | Recipe |
-| --- | --- |
-| 8 Frame Block | sticks in the corners, planks on the edges, empty center |
-| 6 Frame Slab | 3 frame blocks in a row |
-| 6 Frame Vertical Slab | 3 frame blocks in a column |
-| 4 Frame Stairs | 6 frame blocks, stair pattern |
-| 6 Frame Wall | 6 frame blocks, 2 rows |
-| 3 Frame Fence | frame block, stick, frame block (2 rows) |
-| Frame Fence Gate | stick, frame block, stick (2 rows) |
-| 3 Frame Door | 6 frame blocks, 2 wide by 3 tall |
-| 2 Frame Trapdoor | 6 frame blocks, 3 wide by 2 tall |
-| Frame Pressure Plate | 2 frame blocks side by side |
-| Frame Button | 1 frame block |
-| 3 Frame Corner Block | 3 frame blocks in an L |
-| 3 Frame Corner Slab | 3 frame slabs in an L |
-
-## Automated test
-
-`./gradlew runClientGameTest` starts a real client, places every frame shape, fills them (including a real
-right-click and sneak-right-click), checks the data syncs to the client and that breaking a frame drops its block,
-then saves screenshots to `build/run/clientGameTest/screenshots`. On a headless Linux box, run it under
-`xvfb-run` with Mesa's Vulkan driver (`mesa-vulkan-drivers`) installed.
+- **16 Frame Block**: 8 sticks around 1 plank (any wood).
+- **Stonecutter** (1 frame block): 2 slabs, 2 vertical slabs, 1 corner block, 2 corner slabs, 4 quarter slabs, 4 horizontal quarters, 4 vertical quarters, 1 stairs, 2 half stairs, 1 wall, 1 fence, 1 fence gate, 1 door, 1 trapdoor, 2 pressure plates, 4 buttons.
+- **Crafting table**, vanilla patterns using frame blocks in place of planks: slab (3 → 6), stairs (6 → 4), wall (6 → 6), fence (with sticks, → 3), fence gate (with sticks), door (6 → 3), trapdoor (6 → 2), pressure plate (2 → 1), button (1 → 1).

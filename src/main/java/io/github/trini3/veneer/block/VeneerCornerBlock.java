@@ -18,8 +18,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -33,11 +33,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class VeneerCornerBlock extends Block implements EntityBlock, VeneerHolder {
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
-	/** Only used by the slab variant: BOTTOM or TOP. */
-	public static final EnumProperty<SlabType> TYPE = BlockStateProperties.SLAB_TYPE;
+	/** Only used by the slab variant: whether it sits in the top half. */
+	public static final BooleanProperty TOP = BooleanProperty.create("top");
 
-	private static final VoxelShape BOTTOM = Block.box(0, 0, 0, 16, 8, 16);
-	private static final VoxelShape TOP = Block.box(0, 8, 0, 16, 16, 16);
+	private static final VoxelShape BOTTOM_SHAPE = Block.box(0, 0, 0, 16, 8, 16);
+	private static final VoxelShape TOP_SHAPE = Block.box(0, 8, 0, 16, 16, 16);
 
 	private final boolean slab;
 
@@ -46,8 +46,8 @@ public class VeneerCornerBlock extends Block implements EntityBlock, VeneerHolde
 		this.slab = slab;
 		BlockState state = stateDefinition.any().setValue(FACING, Direction.NORTH);
 
-		if (state.hasProperty(TYPE)) {
-			state = state.setValue(TYPE, SlabType.BOTTOM);
+		if (state.hasProperty(TOP)) {
+			state = state.setValue(TOP, false);
 		}
 
 		registerDefaultState(VeneerProps.defaults(state));
@@ -62,7 +62,7 @@ public class VeneerCornerBlock extends Block implements EntityBlock, VeneerHolde
 			@Override
 			protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 				super.createBlockStateDefinition(builder);
-				builder.add(TYPE);
+				builder.add(TOP);
 			}
 		};
 	}
@@ -78,7 +78,7 @@ public class VeneerCornerBlock extends Block implements EntityBlock, VeneerHolde
 			return Shapes.block();
 		}
 
-		return state.getValue(TYPE) == SlabType.TOP ? TOP : BOTTOM;
+		return state.getValue(TOP) ? TOP_SHAPE : BOTTOM_SHAPE;
 	}
 
 	@Override
@@ -121,7 +121,7 @@ public class VeneerCornerBlock extends Block implements EntityBlock, VeneerHolde
 		if (slab) {
 			Direction clicked = context.getClickedFace();
 			boolean top = clicked == Direction.DOWN || (clicked != Direction.UP && context.getClickLocation().y - pos.getY() > 0.5);
-			state = state.setValue(TYPE, top ? SlabType.TOP : SlabType.BOTTOM);
+			state = state.setValue(TOP, top);
 		}
 
 		return state;

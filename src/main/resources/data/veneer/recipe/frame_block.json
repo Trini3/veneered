@@ -2,16 +2,16 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "pattern": [
-    "S#S",
-    "# #",
-    "S#S"
+    "SSS",
+    "SPS",
+    "SSS"
   ],
   "key": {
     "S": "minecraft:stick",
-    "#": "#minecraft:planks"
+    "P": "#minecraft:planks"
   },
   "result": {
     "id": "veneer:frame_block",
-    "count": 8
+    "count": 16
   }
 }
