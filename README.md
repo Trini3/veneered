@@ -54,3 +54,10 @@ Requires JDK 25.
 - **16 Frame Block**: 8 sticks around 1 plank (any wood).
 - **Stonecutter** (1 frame block): 2 slabs, 2 vertical slabs, 1 corner block, 2 corner slabs, 4 quarter slabs, 4 horizontal quarters, 4 vertical quarters, 1 stairs, 2 half stairs, 1 wall, 1 fence, 1 fence gate, 1 door, 1 trapdoor, 2 pressure plates, 4 buttons.
 - **Crafting table**, vanilla patterns using frame blocks in place of planks: slab (3 → 6), stairs (6 → 4), wall (6 → 6), fence (with sticks, → 3), fence gate (with sticks), door (6 → 3), trapdoor (6 → 2), pressure plate (2 → 1), button (1 → 1).
+
+## Automated test
+
+`./gradlew runClientGameTest` starts a real client, places every frame shape, fills them (including a real
+right-click and sneak-right-click), checks the data syncs to the client and that breaking a frame drops its block,
+then saves screenshots to `build/run/clientGameTest/screenshots`. On a headless Linux box, run it under
+`xvfb-run` with Mesa's Vulkan driver (`mesa-vulkan-drivers`) installed.
