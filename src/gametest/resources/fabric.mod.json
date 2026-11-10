@@ -7,7 +7,8 @@
 	"entrypoints": {
 		"fabric-client-gametest": [
 			"io.github.trini3.veneer.gametest.VeneerClientGameTest",
-			"io.github.trini3.veneer.gametest.VeneerShowcaseGameTest"
+			"io.github.trini3.veneer.gametest.VeneerShowcaseGameTest",
+			"io.github.trini3.veneer.gametest.VeneerStressGameTest"
 		]
 	},
 	"depends": {

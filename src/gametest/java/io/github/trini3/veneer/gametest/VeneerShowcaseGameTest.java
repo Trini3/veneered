@@ -59,6 +59,10 @@ public class VeneerShowcaseGameTest implements FabricClientGameTest {
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
+		if (VeneerStressGameTest.ENABLED) {
+			return; // stress runs measure performance only
+		}
+
 		BlockState block = VeneerRegistry.FRAME_BLOCK.defaultBlockState();
 		BlockState slab = VeneerRegistry.FRAME_SLAB.defaultBlockState();
 		BlockState panel = VeneerRegistry.FRAME_PANEL.defaultBlockState().setValue(VeneerPanelBlock.FACING, Direction.SOUTH);

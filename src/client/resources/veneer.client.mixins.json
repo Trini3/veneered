@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "io.github.trini3.veneer.mixin.client",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"SectionCompilerMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

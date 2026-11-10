@@ -33,6 +33,10 @@ public class VeneerClientGameTest implements FabricClientGameTest {
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
+		if (VeneerStressGameTest.ENABLED) {
+			return; // stress runs measure performance only
+		}
+
 		try (TestSingleplayerContext sp = context.worldBuilder().create()) {
 			sp.getConnection().waitForChunksRender();
 			sp.getServer().runCommand("gamemode creative @a");

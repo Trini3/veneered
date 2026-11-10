@@ -2,6 +2,8 @@ package io.github.trini3.veneer.client;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 import org.jspecify.annotations.Nullable;
@@ -44,6 +46,16 @@ public final class VeneerBlockStateModel implements BlockStateModel {
 	private final BlockStateModel frame;
 	private final VeneerHolder holder;
 	private volatile @Nullable Mesh frameMesh;
+	private final Map<RepaintKey, Mesh> repaints = new ConcurrentHashMap<>();
+
+	/** Repainted geometry is cached per combination of held models; a build rarely shows more than a few dozen. */
+	private static final int MAX_REPAINTS = 64;
+
+	private record RepaintKey(@Nullable List<BlockStateModelPart> primary, @Nullable List<BlockStateModelPart> secondary) {
+		@Nullable List<BlockStateModelPart> get(int slot) {
+			return slot == 0 ? primary : secondary;
+		}
+	}
 
 	public VeneerBlockStateModel(BlockStateModel frame, VeneerHolder holder) {
 		this.frame = frame;
@@ -81,37 +93,67 @@ public final class VeneerBlockStateModel implements BlockStateModel {
 			return;
 		}
 
-		// Collect the parts of each held block's model once per call.
-		@SuppressWarnings("unchecked")
-		List<BlockStateModelPart>[] parts = new List[2];
+		// The repainted geometry depends only on this frame state and the held models' parts, so it is built once
+		// per combination and reused by every frame showing the same thing. Only tint is applied per block.
+		RepaintKey key = new RepaintKey(parts(appearance.primary(), random), parts(appearance.secondary(), random));
+		Mesh repainted = repaints.get(key);
 
-		for (int slot = 0; slot < 2; slot++) {
-			BlockState held = appearance.get(slot);
+		if (repainted == null) {
+			repainted = repaint(level, pos, state, random, key);
 
-			if (held != null) {
-				parts[slot] = new ArrayList<>();
-				modelOf(held).collectParts(random, parts[slot]);
+			if (repaints.size() >= MAX_REPAINTS) {
+				repaints.clear();
 			}
+
+			repaints.put(key, repainted);
 		}
 
-		// Tint colours (grass, leaves...) per slot and tint index, computed at most once per call.
 		int[][] tints = new int[2][];
 
-		frameMesh(level, pos, state, random).forEach(quad -> {
+		repainted.forEach(quad -> {
 			Direction cull = quad.cullFace();
 
 			if (cull != null && cullTest.test(cull)) {
 				return;
 			}
 
+			emitter.copyFrom(quad);
+			int tag = quad.tag();
+
+			if (tag != 0) {
+				int slot = (tag >>> 16) - 1;
+				emitter.multiplyColor(tint(tints, slot, tag & 0xFFFF, appearance.get(slot), level, pos));
+				emitter.tag(0);
+			}
+
+			emitter.emit();
+		});
+	}
+
+	private static @Nullable List<BlockStateModelPart> parts(@Nullable BlockState held, RandomSource random) {
+		if (held == null) {
+			return null;
+		}
+
+		List<BlockStateModelPart> parts = new ArrayList<>(1);
+		modelOf(held).collectParts(random, parts);
+		return parts;
+	}
+
+	/** Repaints every frame quad with the held blocks' matching faces. Tinted quads are tagged with slot and tint index. */
+	private Mesh repaint(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, RepaintKey key) {
+		MutableMesh mesh = Renderer.get().mutableMesh();
+		QuadEmitter emitter = mesh.emitter();
+
+		frameMesh(level, pos, state, random).forEach(quad -> {
 			Direction face = quad.lightFace();
 			int slot = holder.slotForPoint(state,
 					centerX(quad) - face.getStepX() * 0.01F,
 					centerY(quad) - face.getStepY() * 0.01F,
 					centerZ(quad) - face.getStepZ() * 0.01F);
-			BlockState held = appearance.get(slot);
+			List<BlockStateModelPart> parts = key.get(slot);
 
-			if (held == null) {
+			if (parts == null) {
 				// This half is still empty: show the bare frame.
 				emitter.copyFrom(quad);
 				emitter.emit();
@@ -120,15 +162,15 @@ public final class VeneerBlockStateModel implements BlockStateModel {
 
 			boolean emitted = false;
 
-			for (BlockStateModelPart part : parts[slot]) {
+			for (BlockStateModelPart part : parts) {
 				for (BakedQuad heldQuad : part.getQuads(face)) {
-					emitRepainted(emitter, quad, face, heldQuad, held, level, pos, tints, slot);
+					emitRepainted(emitter, quad, face, heldQuad, slot);
 					emitted = true;
 				}
 
 				for (BakedQuad heldQuad : part.getQuads(null)) {
 					if (heldQuad.direction() == face) {
-						emitRepainted(emitter, quad, face, heldQuad, held, level, pos, tints, slot);
+						emitRepainted(emitter, quad, face, heldQuad, slot);
 						emitted = true;
 					}
 				}
@@ -139,9 +181,11 @@ public final class VeneerBlockStateModel implements BlockStateModel {
 				emitter.emit();
 			}
 		});
+
+		return mesh.immutableCopy();
 	}
 
-	private static void emitRepainted(QuadEmitter emitter, QuadView shape, Direction face, BakedQuad source, BlockState held, BlockAndTintGetter level, BlockPos pos, int[][] tints, int slot) {
+	private static void emitRepainted(QuadEmitter emitter, QuadView shape, Direction face, BakedQuad source, int slot) {
 		// Start from the held block's quad to inherit its material (render layer, atlas, emissive, shading)...
 		emitter.fromBakedQuad(source);
 
@@ -210,30 +254,42 @@ public final class VeneerBlockStateModel implements BlockStateModel {
 			emitter.uv(i, Mth.clamp(u, minSpriteU, maxSpriteU), Mth.clamp(v, minSpriteV, maxSpriteV));
 		}
 
-		// The renderer would tint using the frame's block colors, so apply the held block's tint (grass, leaves) here.
+		// The renderer would tint using the frame's block colors. Tag the quad so the held block's tint (grass,
+		// leaves) can be applied per position when the cached quad is emitted.
 		int tintIndex = source.materialInfo().tintIndex();
 
 		if (tintIndex >= 0) {
-			if (tints[slot] == null || tintIndex >= tints[slot].length) {
-				int[] grown = new int[Math.max(tintIndex + 1, 2)];
-				java.util.Arrays.fill(grown, Integer.MIN_VALUE);
-
-				if (tints[slot] != null) {
-					System.arraycopy(tints[slot], 0, grown, 0, tints[slot].length);
-				}
-
-				tints[slot] = grown;
-			}
-
-			if (tints[slot][tintIndex] == Integer.MIN_VALUE) {
-				tints[slot][tintIndex] = tint(held, level, pos, tintIndex);
-			}
-
-			emitter.multiplyColor(tints[slot][tintIndex]);
 			emitter.tintIndex(-1);
+			emitter.tag(((slot + 1) << 16) | (tintIndex & 0xFFFF));
+		} else {
+			emitter.tag(0);
 		}
 
 		emitter.emit();
+	}
+
+	/** Tint colour for a slot and tint index, computed at most once per block. */
+	private static int tint(int[][] tints, int slot, int tintIndex, @Nullable BlockState held, BlockAndTintGetter level, BlockPos pos) {
+		if (held == null) {
+			return -1;
+		}
+
+		if (tints[slot] == null || tintIndex >= tints[slot].length) {
+			int[] grown = new int[Math.max(tintIndex + 1, 2)];
+			java.util.Arrays.fill(grown, Integer.MIN_VALUE);
+
+			if (tints[slot] != null) {
+				System.arraycopy(tints[slot], 0, grown, 0, tints[slot].length);
+			}
+
+			tints[slot] = grown;
+		}
+
+		if (tints[slot][tintIndex] == Integer.MIN_VALUE) {
+			tints[slot][tintIndex] = tint(held, level, pos, tintIndex);
+		}
+
+		return tints[slot][tintIndex];
 	}
 
 	private static int tint(BlockState held, BlockAndTintGetter level, BlockPos pos, int tintIndex) {

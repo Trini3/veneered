@@ -35,10 +35,19 @@ Doors, trapdoors and fence gates still open with an empty hand (or any item that
 
 ## Compatibility and performance
 
-- No mixins and no changes to vanilla blocks, models or rendering. Frames are the mod's own blocks, rendered through the Fabric Renderer API (works with Indigo and Sodium's Fabric Renderer API support).
+- No changes to vanilla blocks, models or rendering. Frames are the mod's own blocks, rendered through the Fabric Renderer API (works with Indigo and Sodium's Fabric Renderer API support).
+- One small client-only mixin: it leaves Veneer's own block entities off vanilla's per-frame block entity list, since frames are drawn by the chunk mesh and have nothing to render there. It only skips Veneer block entities and changes nothing for anything else.
 - Vanilla tags are only added to (`replace: false`).
-- Frame geometry is cached per block state and tint colours per block, so re-meshing a chunk of frames stays cheap.
+- Frame block entities never tick. Each one stores two block states (about 5 bytes per frame in the compressed save file).
+- Repainted frame geometry is cached per block state and per combination of held blocks, and tint colours are computed once per block, so meshing a chunk of frames costs about the same as meshing the same vanilla blocks.
 - Light emission is stored in 4 steps (0, 5, 10, 15) to keep the block-state count down.
+
+### Stress test
+
+`VENEER_STRESS=1 ./gradlew runClientGameTest` builds about 64,000 filled frames, measures them, swaps every frame
+for the vanilla block that looks the same and measures again. Results land in `build/run/clientGameTest/veneer-stress.txt`.
+The cost that remains is the one any block entity has: vanilla and Fabric copy a chunk's block entity list each time a
+section of it is rebuilt, so chunks packed with thousands of frames take longer to load and re-mesh than plain blocks.
 
 ## Building
 
