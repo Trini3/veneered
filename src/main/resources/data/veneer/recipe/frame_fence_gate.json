@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "SFS",
+    "SFS"
+  ],
+  "key": {
+    "F": "veneer:frame_block",
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "veneer:frame_fence_gate",
+    "count": 1
+  }
+}

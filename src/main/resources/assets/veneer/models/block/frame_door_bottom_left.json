@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_bottom_left",
+  "textures": {
+    "bottom": "veneer:block/frame",
+    "top": "veneer:block/frame"
+  }
+}

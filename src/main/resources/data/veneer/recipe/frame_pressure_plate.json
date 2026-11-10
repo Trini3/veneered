@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "FF"
+  ],
+  "key": {
+    "F": "veneer:frame_block"
+  },
+  "result": {
+    "id": "veneer:frame_pressure_plate",
+    "count": 1
+  }
+}

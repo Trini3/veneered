@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "S#S",
+    "# #",
+    "S#S"
+  ],
+  "key": {
+    "S": "minecraft:stick",
+    "#": "#minecraft:planks"
+  },
+  "result": {
+    "id": "veneer:frame_block",
+    "count": 8
+  }
+}

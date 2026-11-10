@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "values": [
+    "veneer:frame_block",
+    "veneer:frame_slab",
+    "veneer:frame_panel",
+    "veneer:frame_stairs",
+    "veneer:frame_wall",
+    "veneer:frame_fence",
+    "veneer:frame_fence_gate",
+    "veneer:frame_door",
+    "veneer:frame_trapdoor",
+    "veneer:frame_pressure_plate",
+    "veneer:frame_button"
+  ]
+}

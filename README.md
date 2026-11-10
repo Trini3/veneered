@@ -1,9 +1,47 @@
-# Trini's Flavor Content
+# Veneer
 
-A collection of small "flavor content" Minecraft mods for **Fabric**, kept up to date with the newest Minecraft versions Fabric supports.
+A Fabric mod for Minecraft 26.3 that adds **frame blocks**: shapes that take on the look of any block you put in them.
+Make dirt doors, grass walls, glass stairs, or a slab that is half stone and half planks.
 
-Each mod lives on its own branch:
+## How it works
 
-| Mod | Branch | What it does |
-| --- | --- | --- |
-| Veneer | [`veneer`](../../tree/veneer) | Frame blocks that copy the look of any block: dirt doors, grass walls, two-tone slabs and panels. |
+- Craft a **Frame Block** (8 from sticks and planks), then craft it into the other shapes.
+- **Right-click a frame with a block** to make the frame look like that block. The block is used up and given back when you change or remove it.
+- **Sneak + right-click with an empty hand** to take the block back out.
+- Breaking a frame drops the frame and whatever blocks were inside.
+
+### Shapes
+
+Frame Block, Slab, Panel (vertical slab), Stairs, Wall, Fence, Fence Gate, Door, Trapdoor, Pressure Plate, Button.
+
+### Two-tone blocks
+
+- **Slabs**: place a frame slab on top of another. Each half keeps its own look, so you can have stone on the bottom and planks on top. Right-click the half you want to change.
+- **Panels**: place a second frame panel against the open side of the first. The two halves keep separate looks, which gives walls with a different inside and outside.
+
+Doors, trapdoors and fence gates still open with an empty hand (or any item that isn't a block).
+
+## Building
+
+Requires JDK 25.
+
+```
+./gradlew build      # jar ends up in build/libs
+./gradlew runClient  # launch a dev client
+```
+
+## Recipes
+
+| Item | Recipe |
+| --- | --- |
+| 8 Frame Block | sticks in the corners, planks on the edges, empty center |
+| 6 Frame Slab | 3 frame blocks in a row |
+| 6 Frame Panel | 3 frame blocks in a column |
+| 4 Frame Stairs | 6 frame blocks, stair pattern |
+| 6 Frame Wall | 6 frame blocks, 2 rows |
+| 3 Frame Fence | frame block, stick, frame block (2 rows) |
+| Frame Fence Gate | stick, frame block, stick (2 rows) |
+| 3 Frame Door | 6 frame blocks, 2 wide by 3 tall |
+| 2 Frame Trapdoor | 6 frame blocks, 3 wide by 2 tall |
+| Frame Pressure Plate | 2 frame blocks side by side |
+| Frame Button | 1 frame block |

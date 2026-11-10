@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "veneer:block/frame_block"
+    }
+  }
+}

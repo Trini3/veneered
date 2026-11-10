@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "veneer:block/frame_pressure_plate"
+  }
+}

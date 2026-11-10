@@ -1,0 +1,27 @@
+{
+	"schemaVersion": 1,
+	"id": "veneer",
+	"version": "${version}",
+	"name": "Veneer",
+	"description": "Frame blocks that take on the look of any block you put in them. Make dirt doors, grass walls, and two-tone slabs and panels.",
+	"authors": [
+		"Trini3"
+	],
+	"license": "MIT",
+	"icon": "assets/veneer/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"io.github.trini3.veneer.Veneer"
+		],
+		"client": [
+			"io.github.trini3.veneer.client.VeneerClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}

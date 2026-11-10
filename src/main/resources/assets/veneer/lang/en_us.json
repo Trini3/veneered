@@ -1,0 +1,14 @@
+{
+  "block.veneer.frame_block": "Frame Block",
+  "block.veneer.frame_slab": "Frame Slab",
+  "block.veneer.frame_panel": "Frame Panel",
+  "block.veneer.frame_stairs": "Frame Stairs",
+  "block.veneer.frame_wall": "Frame Wall",
+  "block.veneer.frame_fence": "Frame Fence",
+  "block.veneer.frame_fence_gate": "Frame Fence Gate",
+  "block.veneer.frame_door": "Frame Door",
+  "block.veneer.frame_trapdoor": "Frame Trapdoor",
+  "block.veneer.frame_pressure_plate": "Frame Pressure Plate",
+  "block.veneer.frame_button": "Frame Button",
+  "itemGroup.veneer.frames": "Veneer Frames"
+}

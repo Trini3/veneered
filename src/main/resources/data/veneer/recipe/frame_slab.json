@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "FFF"
+  ],
+  "key": {
+    "F": "veneer:frame_block"
+  },
+  "result": {
+    "id": "veneer:frame_slab",
+    "count": 6
+  }
+}
