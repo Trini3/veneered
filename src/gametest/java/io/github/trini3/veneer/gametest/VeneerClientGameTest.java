@@ -62,7 +62,39 @@ public class VeneerClientGameTest implements FabricClientGameTest {
 			context.waitTicks(5);
 			context.getInput().releaseShift();
 			assertSlot(sp, clickPos, 0, null);
+
+			// Directional blocks keep the orientation they'd get when placed: clicking the north face with a log
+			// gives a north-south (Z axis) log.
+			sp.getServer().runOnServer(server -> sp.getConnection().getServerPlayer().setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.OAK_LOG)));
+			context.waitTicks(2);
+			context.getInput().pressKey(options -> options.keyUse);
+			context.waitTicks(5);
+			sp.getServer().runOnServer(server -> {
+				if (!(sp.getConnection().getServerLevel().getBlockEntity(clickPos) instanceof VeneerBlockEntity be)
+						|| be.get(0) == null || !be.get(0).is(Blocks.OAK_LOG)
+						|| be.get(0).getValue(net.minecraft.world.level.block.RotatedPillarBlock.AXIS) != Direction.Axis.Z) {
+					throw new AssertionError("Expected a Z-axis oak log in the frame");
+				}
+			});
 			setBlock(sp, clickPos, Blocks.AIR.defaultBlockState());
+
+			// Corner blocks point their small quarter at the player: standing north-west of it gives the NW quarter.
+			sp.getServer().runCommand("tp @a 0.2 %d 0.5 0 60".formatted(Y));
+			sp.getServer().runOnServer(server -> sp.getConnection().getServerPlayer().setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(VeneerRegistry.FRAME_CORNER)));
+			context.waitTicks(5);
+			BlockPos cornerPos = new BlockPos(0, Y, 2);
+			context.getInput().lookAt(cornerPos.below());
+			context.waitTick();
+			context.getInput().pressKey(options -> options.keyUse);
+			context.waitTicks(5);
+			sp.getServer().runOnServer(server -> {
+				BlockState placed = sp.getConnection().getServerLevel().getBlockState(cornerPos);
+
+				if (!placed.is(VeneerRegistry.FRAME_CORNER) || placed.getValue(io.github.trini3.veneer.block.VeneerCornerBlock.FACING) != Direction.WEST) {
+					throw new AssertionError("Expected a corner block with its quarter to the north-west, got " + placed);
+				}
+			});
+			setBlock(sp, cornerPos, Blocks.AIR.defaultBlockState());
 
 			// --- 2. Showcase row: every shape, filled directly ---
 			BlockState slabDouble = VeneerRegistry.FRAME_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);

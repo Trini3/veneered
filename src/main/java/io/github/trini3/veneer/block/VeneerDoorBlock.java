@@ -28,7 +28,7 @@ public class VeneerDoorBlock extends DoorBlock implements EntityBlock, VeneerHol
 
 	@Override
 	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-		InteractionResult result = VeneerLogic.useItemOn(this, stack, state, level, pos, player, hit);
+		InteractionResult result = VeneerLogic.useItemOn(this, stack, state, level, pos, player, hand, hit);
 		return result == InteractionResult.TRY_WITH_EMPTY_HAND ? super.useItemOn(stack, state, level, pos, player, hand, hit) : result;
 	}
 

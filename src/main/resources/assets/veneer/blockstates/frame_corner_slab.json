@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,type=bottom": {
+      "model": "veneer:block/frame_corner_slab"
+    },
+    "facing=north,type=top": {
+      "model": "veneer:block/frame_corner_slab_top"
+    },
+    "facing=east,type=bottom": {
+      "model": "veneer:block/frame_corner_slab",
+      "y": 90
+    },
+    "facing=east,type=top": {
+      "model": "veneer:block/frame_corner_slab_top",
+      "y": 90
+    },
+    "facing=south,type=bottom": {
+      "model": "veneer:block/frame_corner_slab",
+      "y": 180
+    },
+    "facing=south,type=top": {
+      "model": "veneer:block/frame_corner_slab_top",
+      "y": 180
+    },
+    "facing=west,type=bottom": {
+      "model": "veneer:block/frame_corner_slab",
+      "y": 270
+    },
+    "facing=west,type=top": {
+      "model": "veneer:block/frame_corner_slab_top",
+      "y": 270
+    }
+  }
+}

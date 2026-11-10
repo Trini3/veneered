@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "veneer:block/frame_corner"
+    },
+    "facing=east": {
+      "model": "veneer:block/frame_corner",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "veneer:block/frame_corner",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "veneer:block/frame_corner",
+      "y": 270
+    }
+  }
+}

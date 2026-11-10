@@ -5,9 +5,11 @@ import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Prediction;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -35,7 +37,7 @@ public final class VeneerLogic {
 	 * Right-click with an item. If the item is a valid block, it is put into the slot the player is pointing at.
 	 * Otherwise the click falls through to the block's normal behaviour (opening doors, etc).
 	 */
-	public static InteractionResult useItemOn(VeneerHolder holder, ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+	public static InteractionResult useItemOn(VeneerHolder holder, ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (stack.isEmpty() || !(level.getBlockEntity(pos) instanceof VeneerBlockEntity frame)) {
 			return InteractionResult.TRY_WITH_EMPTY_HAND;
 		}
@@ -48,16 +50,19 @@ public final class VeneerLogic {
 
 		int slot = holder.slotForHit(state, pos, hit);
 		@Nullable BlockState current = frame.get(slot);
+		BlockState appearance = placementState(handBlock, player, hand, stack, hit);
 
-		if (current != null && current.is(handBlock)) {
+		if (current == appearance) {
 			return InteractionResult.TRY_WITH_EMPTY_HAND;
 		}
 
 		if (!level.isClientSide()) {
-			BlockState appearance = handBlock.defaultBlockState();
 			boolean creative = player.getAbilities().instabuild;
 
-			if (!creative) {
+			// Re-orienting the same block (e.g. turning a log sideways) doesn't use up another item.
+			boolean sameBlock = current != null && current.is(handBlock);
+
+			if (!creative && !sameBlock) {
 				stack.shrink(1);
 
 				if (current != null) {
@@ -133,5 +138,21 @@ public final class VeneerLogic {
 		}
 
 		return frameProgress;
+	}
+
+	/**
+	 * The state the held block would get if the player placed it against the face they clicked, so directional
+	 * blocks keep their orientation: logs follow the clicked face, furnaces and pumpkins face the player, and so on.
+	 */
+	public static BlockState placementState(Block block, Player player, InteractionHand hand, ItemStack stack, BlockHitResult hit) {
+		BlockState placed = null;
+
+		try {
+			placed = block.getStateForPlacement(new BlockPlaceContext(player, hand, stack, hit));
+		} catch (RuntimeException e) {
+			// Some modded blocks assume a real placement; fall back to their default state.
+		}
+
+		return placed != null && placed.is(block) ? placed : block.defaultBlockState();
 	}
 }

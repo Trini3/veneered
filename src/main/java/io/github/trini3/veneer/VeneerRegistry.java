@@ -35,6 +35,8 @@ public final class VeneerRegistry {
 	public static final Block FRAME_SLAB = register("frame_slab", VeneerSlabBlock::new, solidProps(Blocks.OAK_SLAB));
 	public static final Block FRAME_PANEL = register("frame_panel", VeneerPanelBlock::new, solidProps(Blocks.OAK_SLAB));
 	public static final Block FRAME_STAIRS = register("frame_stairs", p -> new VeneerStairBlock(Blocks.OAK_PLANKS.defaultBlockState(), p), solidProps(Blocks.OAK_STAIRS));
+	public static final Block FRAME_CORNER = register("frame_corner", VeneerCornerBlock::block, solidProps(Blocks.OAK_PLANKS));
+	public static final Block FRAME_CORNER_SLAB = register("frame_corner_slab", VeneerCornerBlock::slab, solidProps(Blocks.OAK_SLAB));
 	public static final Block FRAME_WALL = register("frame_wall", VeneerWallBlock::new, props(Blocks.OAK_PLANKS).forceSolidOn());
 	public static final Block FRAME_FENCE = register("frame_fence", VeneerFenceBlock::new, props(Blocks.OAK_FENCE));
 	public static final Block FRAME_FENCE_GATE = register("frame_fence_gate", p -> new VeneerFenceGateBlock(WoodType.OAK, p), props(Blocks.OAK_FENCE_GATE));
@@ -58,7 +60,7 @@ public final class VeneerRegistry {
 	 * Thin shapes copy their vanilla oak counterpart and never occlude. They glow like the block inside.
 	 */
 	private static BlockBehaviour.Properties props(Block base) {
-		return BlockBehaviour.Properties.ofFullCopy(base).noOcclusion().lightLevel(state -> state.getValue(VeneerProps.LIGHT));
+		return BlockBehaviour.Properties.ofFullCopy(base).noOcclusion().lightLevel(VeneerProps::lightLevel);
 	}
 
 	/**
@@ -66,7 +68,7 @@ public final class VeneerRegistry {
 	 * see {@link VeneerProps#OPAQUE}.
 	 */
 	private static BlockBehaviour.Properties solidProps(Block base) {
-		return BlockBehaviour.Properties.ofFullCopy(base).lightLevel(state -> state.getValue(VeneerProps.LIGHT));
+		return BlockBehaviour.Properties.ofFullCopy(base).lightLevel(VeneerProps::lightLevel);
 	}
 
 	private static Block register(String name, Function<BlockBehaviour.Properties, Block> factory, BlockBehaviour.Properties properties) {

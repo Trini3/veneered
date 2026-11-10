@@ -6,7 +6,10 @@ import java.util.function.Predicate;
 
 import org.jspecify.annotations.Nullable;
 
+import org.joml.Vector3fc;
+
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
@@ -91,6 +94,9 @@ public final class VeneerBlockStateModel implements BlockStateModel {
 			}
 		}
 
+		// Tint colours (grass, leaves...) per slot and tint index, computed at most once per call.
+		int[][] tints = new int[2][];
+
 		frameMesh(level, pos, state, random).forEach(quad -> {
 			Direction cull = quad.cullFace();
 
@@ -116,13 +122,13 @@ public final class VeneerBlockStateModel implements BlockStateModel {
 
 			for (BlockStateModelPart part : parts[slot]) {
 				for (BakedQuad heldQuad : part.getQuads(face)) {
-					emitRepainted(emitter, quad, face, heldQuad, held, level, pos);
+					emitRepainted(emitter, quad, face, heldQuad, held, level, pos, tints, slot);
 					emitted = true;
 				}
 
 				for (BakedQuad heldQuad : part.getQuads(null)) {
 					if (heldQuad.direction() == face) {
-						emitRepainted(emitter, quad, face, heldQuad, held, level, pos);
+						emitRepainted(emitter, quad, face, heldQuad, held, level, pos, tints, slot);
 						emitted = true;
 					}
 				}
@@ -135,7 +141,7 @@ public final class VeneerBlockStateModel implements BlockStateModel {
 		});
 	}
 
-	private static void emitRepainted(QuadEmitter emitter, QuadView shape, Direction face, BakedQuad source, BlockState held, BlockAndTintGetter level, BlockPos pos) {
+	private static void emitRepainted(QuadEmitter emitter, QuadView shape, Direction face, BakedQuad source, BlockState held, BlockAndTintGetter level, BlockPos pos, int[][] tints, int slot) {
 		// Start from the held block's quad to inherit its material (render layer, atlas, emissive, shading)...
 		emitter.fromBakedQuad(source);
 
@@ -151,46 +157,79 @@ public final class VeneerBlockStateModel implements BlockStateModel {
 		emitter.cullFace(shape.cullFace());
 		emitter.nominalFace(shape.nominalFace());
 
-		// Project UVs from the face position (like vanilla's default face UVs), so textures tile seamlessly.
-		float[] us = new float[4];
-		float[] vs = new float[4];
+		// Project each vertex onto the face (like vanilla's default face UVs) so textures line up across blocks...
 		float minU = Float.MAX_VALUE;
 		float minV = Float.MAX_VALUE;
 
 		for (int i = 0; i < 4; i++) {
-			float x = shape.x(i);
-			float y = shape.y(i);
-			float z = shape.z(i);
-
-			switch (face) {
-				case DOWN -> { us[i] = x; vs[i] = 1 - z; }
-				case UP -> { us[i] = x; vs[i] = z; }
-				case NORTH -> { us[i] = 1 - x; vs[i] = 1 - y; }
-				case SOUTH -> { us[i] = x; vs[i] = 1 - y; }
-				case WEST -> { us[i] = z; vs[i] = 1 - y; }
-				case EAST -> { us[i] = 1 - z; vs[i] = 1 - y; }
-			}
-
-			minU = Math.min(minU, us[i]);
-			minV = Math.min(minV, vs[i]);
+			minU = Math.min(minU, projU(face, shape.x(i), shape.y(i), shape.z(i)));
+			minV = Math.min(minV, projV(face, shape.x(i), shape.y(i), shape.z(i)));
 		}
 
-		// Shift faces that sit outside the block (e.g. lowered fence gates) back into the 0..1 texture range.
+		// ...shifting faces that sit outside the block (e.g. lowered fence gates) back into the 0..1 range...
 		float shiftU = Mth.floor(minU + INSET);
 		float shiftV = Mth.floor(minV + INSET);
+
+		// ...then map through the held quad's own projected-position -> texture mapping. This keeps the held
+		// block's texture rotation and flips (a sideways log's bark runs sideways) and any sub-region it uses.
+		Vector3fc p0 = source.position0();
+		Vector3fc p1 = source.position1();
+		Vector3fc p2 = source.position2();
+		float a0 = projU(face, p0.x(), p0.y(), p0.z()), b0 = projV(face, p0.x(), p0.y(), p0.z());
+		float da1 = projU(face, p1.x(), p1.y(), p1.z()) - a0, db1 = projV(face, p1.x(), p1.y(), p1.z()) - b0;
+		float da2 = projU(face, p2.x(), p2.y(), p2.z()) - a0, db2 = projV(face, p2.x(), p2.y(), p2.z()) - b0;
+		float det = da1 * db2 - da2 * db1;
+		long t0 = source.packedUV0(), t1 = source.packedUV1(), t2 = source.packedUV2();
+		float u0 = UVPair.unpackU(t0), v0 = UVPair.unpackV(t0);
 		TextureAtlasSprite sprite = source.materialInfo().sprite();
+		float minSpriteU = Math.min(sprite.getU0(), sprite.getU1()), maxSpriteU = Math.max(sprite.getU0(), sprite.getU1());
+		float minSpriteV = Math.min(sprite.getV0(), sprite.getV1()), maxSpriteV = Math.max(sprite.getV0(), sprite.getV1());
+		boolean affine = Math.abs(det) > 1e-6F;
+		float du1 = UVPair.unpackU(t1) - u0, dv1 = UVPair.unpackV(t1) - v0;
+		float du2 = UVPair.unpackU(t2) - u0, dv2 = UVPair.unpackV(t2) - v0;
 
 		for (int i = 0; i < 4; i++) {
-			float u = Mth.clamp(us[i] - shiftU, 0, 1);
-			float v = Mth.clamp(vs[i] - shiftV, 0, 1);
-			emitter.uv(i, Mth.lerp(u, sprite.getU0(), sprite.getU1()), Mth.lerp(v, sprite.getV0(), sprite.getV1()));
+			float pu = Mth.clamp(projU(face, shape.x(i), shape.y(i), shape.z(i)) - shiftU, 0, 1);
+			float pv = Mth.clamp(projV(face, shape.x(i), shape.y(i), shape.z(i)) - shiftV, 0, 1);
+			float u;
+			float v;
+
+			if (affine) {
+				// Solve (pu, pv) - P0 = s * (P1 - P0) + t * (P2 - P0), then apply the same s, t to the UVs.
+				float da = pu - a0;
+				float db = pv - b0;
+				float s1 = (da * db2 - da2 * db) / det;
+				float s2 = (da1 * db - da * db1) / det;
+				u = u0 + s1 * du1 + s2 * du2;
+				v = v0 + s1 * dv1 + s2 * dv2;
+			} else {
+				u = Mth.lerp(pu, sprite.getU0(), sprite.getU1());
+				v = Mth.lerp(pv, sprite.getV0(), sprite.getV1());
+			}
+
+			emitter.uv(i, Mth.clamp(u, minSpriteU, maxSpriteU), Mth.clamp(v, minSpriteV, maxSpriteV));
 		}
 
 		// The renderer would tint using the frame's block colors, so apply the held block's tint (grass, leaves) here.
 		int tintIndex = source.materialInfo().tintIndex();
 
 		if (tintIndex >= 0) {
-			emitter.multiplyColor(tint(held, level, pos, tintIndex));
+			if (tints[slot] == null || tintIndex >= tints[slot].length) {
+				int[] grown = new int[Math.max(tintIndex + 1, 2)];
+				java.util.Arrays.fill(grown, Integer.MIN_VALUE);
+
+				if (tints[slot] != null) {
+					System.arraycopy(tints[slot], 0, grown, 0, tints[slot].length);
+				}
+
+				tints[slot] = grown;
+			}
+
+			if (tints[slot][tintIndex] == Integer.MIN_VALUE) {
+				tints[slot][tintIndex] = tint(held, level, pos, tintIndex);
+			}
+
+			emitter.multiplyColor(tints[slot][tintIndex]);
 			emitter.tintIndex(-1);
 		}
 
@@ -206,6 +245,23 @@ public final class VeneerBlockStateModel implements BlockStateModel {
 
 		BlockTintSource source = sources.get(tintIndex);
 		return source == null ? -1 : 0xFF000000 | source.colorInWorld(held, level, pos);
+	}
+
+	private static float projU(Direction face, float x, float y, float z) {
+		return switch (face) {
+			case DOWN, UP, SOUTH -> x;
+			case NORTH -> 1 - x;
+			case WEST -> z;
+			case EAST -> 1 - z;
+		};
+	}
+
+	private static float projV(Direction face, float x, float y, float z) {
+		return switch (face) {
+			case DOWN -> 1 - z;
+			case UP -> z;
+			default -> 1 - y;
+		};
 	}
 
 	private static float centerX(QuadView quad) {

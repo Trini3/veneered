@@ -11,6 +11,8 @@
     "veneer:frame_door",
     "veneer:frame_trapdoor",
     "veneer:frame_pressure_plate",
-    "veneer:frame_button"
+    "veneer:frame_button",
+    "veneer:frame_corner",
+    "veneer:frame_corner_slab"
   ]
 }

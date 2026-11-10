@@ -18,14 +18,25 @@ Make dirt doors, grass walls, glass stairs, or a slab that is half stone and hal
 
 ### Shapes
 
-Frame Block, Slab, Vertical Slab, Stairs, Wall, Fence, Fence Gate, Door, Trapdoor, Pressure Plate, Button.
+Frame Block, Slab, Vertical Slab, Corner Block, Corner Slab, Stairs, Wall, Fence, Fence Gate, Door, Trapdoor, Pressure Plate, Button.
 
 ### Two-tone blocks
 
 - **Slabs**: place a frame slab on top of another. Each half keeps its own look, so you can have stone on the bottom and planks on top. Right-click the half you want to change.
 - **Vertical slabs**: place a second frame vertical slab against the open side of the first (the vertical half-and-half block). The two halves keep separate looks, which gives walls with a different inside and outside.
 
+- **Corner blocks and corner slabs**: split 3/4 and 1/4, with the small quarter pointing toward you when you place it. Stand inside the room when placing a corner and the quarter lands on the inside corner, so it lines up with two-tone vertical-slab walls (outside look in the L, inside look in the quarter).
+
+Directional blocks keep the orientation they'd get if you placed them normally: a log follows the face you click, a furnace or pumpkin faces you. Right-click again with the same block to re-orient it without using another item.
+
 Doors, trapdoors and fence gates still open with an empty hand (or any item that isn't a block).
+
+## Compatibility and performance
+
+- No mixins and no changes to vanilla blocks, models or rendering. Frames are the mod's own blocks, rendered through the Fabric Renderer API (works with Indigo and Sodium's Fabric Renderer API support).
+- Vanilla tags are only added to (`replace: false`).
+- Frame geometry is cached per block state and tint colours per block, so re-meshing a chunk of frames stays cheap.
+- Light emission is stored in 4 steps (0, 5, 10, 15) to keep the block-state count down.
 
 ## Building
 
@@ -51,6 +62,8 @@ Requires JDK 25.
 | 2 Frame Trapdoor | 6 frame blocks, 3 wide by 2 tall |
 | Frame Pressure Plate | 2 frame blocks side by side |
 | Frame Button | 1 frame block |
+| 3 Frame Corner Block | 3 frame blocks in an L |
+| 3 Frame Corner Slab | 3 frame slabs in an L |
 
 ## Automated test
 

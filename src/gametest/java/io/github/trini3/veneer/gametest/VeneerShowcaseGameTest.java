@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
@@ -27,6 +28,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 
 import io.github.trini3.veneer.VeneerRegistry;
 import io.github.trini3.veneer.block.VeneerBlockEntity;
+import io.github.trini3.veneer.block.VeneerCornerBlock;
 import io.github.trini3.veneer.block.VeneerPanelBlock;
 
 /** Builds a showcase of every frame shape (empty, filled, two-tone, connected) and screenshots it. */
@@ -36,6 +38,7 @@ public class VeneerShowcaseGameTest implements FabricClientGameTest {
 	private record Placement(BlockPos pos, BlockState state, @Nullable Block a, @Nullable Block b) { }
 
 	private final List<Placement> scene = new ArrayList<>();
+	private final List<Object[]> oriented = new ArrayList<>();
 
 	private void put(int x, int z, BlockState state, @Nullable Block a, @Nullable Block b) {
 		scene.add(new Placement(new BlockPos(x, Y, z), state, a, b));
@@ -126,6 +129,34 @@ public class VeneerShowcaseGameTest implements FabricClientGameTest {
 		put(14, 19, panel, Blocks.JACK_O_LANTERN);
 		put(16, 19, wall, Blocks.OCHRE_FROGLIGHT);
 
+				// Directional blocks and corners (z=6, x=24..36).
+		put(24, 6, block, null, null);
+		put(26, 6, block, null, null);
+		put(28, 6, block, null, null);
+		put(30, 6, block, null, null);
+		put(32, 6, stairs, null, null);
+		put(34, 6, VeneerRegistry.FRAME_CORNER.defaultBlockState().setValue(VeneerCornerBlock.FACING, Direction.WEST), Blocks.STONE_BRICKS, Blocks.OAK_PLANKS);
+		put(36, 6, VeneerRegistry.FRAME_CORNER_SLAB.defaultBlockState().setValue(VeneerCornerBlock.FACING, Direction.WEST), Blocks.SMOOTH_STONE, Blocks.CRIMSON_PLANKS);
+		oriented.add(new Object[] {new BlockPos(24, Y, 6), Blocks.OAK_LOG.defaultBlockState().setValue(RotatedPillarBlock.AXIS, Direction.Axis.X)});
+		oriented.add(new Object[] {new BlockPos(26, Y, 6), Blocks.OAK_LOG.defaultBlockState()});
+		oriented.add(new Object[] {new BlockPos(28, Y, 6), Blocks.OAK_LOG.defaultBlockState().setValue(RotatedPillarBlock.AXIS, Direction.Axis.Z)});
+		oriented.add(new Object[] {new BlockPos(30, Y, 6), Blocks.FURNACE.defaultBlockState().setValue(net.minecraft.world.level.block.FurnaceBlock.FACING, Direction.NORTH)});
+		oriented.add(new Object[] {new BlockPos(32, Y, 6), Blocks.BIRCH_LOG.defaultBlockState().setValue(RotatedPillarBlock.AXIS, Direction.Axis.X)});
+
+		// A room corner (x=24..28, z=20..24): vertical-slab walls with bricks outside and planks inside,
+		// meeting at corner blocks whose quarter sits on the inside.
+		for (int y = 0; y < 2; y++) {
+			for (int x = 24; x < 28; x++) {
+				scene.add(new Placement(new BlockPos(x, Y + y, 24), panel.setValue(VeneerPanelBlock.DOUBLE, true), Blocks.BRICKS, Blocks.SPRUCE_PLANKS));
+			}
+
+			for (int z = 20; z < 24; z++) {
+				scene.add(new Placement(new BlockPos(28, Y + y, z), panel.setValue(VeneerPanelBlock.FACING, Direction.EAST).setValue(VeneerPanelBlock.DOUBLE, true), Blocks.BRICKS, Blocks.SPRUCE_PLANKS));
+			}
+
+			scene.add(new Placement(new BlockPos(28, Y + y, 24), VeneerRegistry.FRAME_CORNER.defaultBlockState().setValue(VeneerCornerBlock.FACING, Direction.WEST), Blocks.BRICKS, Blocks.SPRUCE_PLANKS));
+		}
+
 				try (TestSingleplayerContext sp = context.worldBuilder().create()) {
 			sp.getConnection().waitForChunksRender();
 			sp.getServer().runCommand("gamemode spectator @a");
@@ -154,6 +185,12 @@ public class VeneerShowcaseGameTest implements FabricClientGameTest {
 						if (p.b() != null) be.set(1, p.b().defaultBlockState());
 					}
 				}
+
+				for (Object[] o : oriented) {
+					if (level.getBlockEntity((BlockPos) o[0]) instanceof VeneerBlockEntity be) {
+						be.set(0, (BlockState) o[1]);
+					}
+				}
 			});
 
 			shot(context, sp, "showcase_overview", 11, 9, 0, 0, 45);
@@ -165,6 +202,10 @@ public class VeneerShowcaseGameTest implements FabricClientGameTest {
 			shot(context, sp, "showcase_twotone_right", 17, 3, 10, 0, 25);
 			shot(context, sp, "showcase_panel_wall_outside", 2.5, 2.5, 25, 180, 10);
 			shot(context, sp, "showcase_panel_wall_inside", 2.5, 2.5, 15.5, 0, 10);
+
+			shot(context, sp, "showcase_directional_corners", 30, 3, 2, 0, 25);
+			shot(context, sp, "showcase_room_corner_outside", 32.5, 3, 28.5, 135, 20);
+			shot(context, sp, "showcase_room_corner_inside", 25, 2.5, 21, -45, 15);
 
 			sp.getServer().runCommand("time set midnight");
 			context.waitTicks(20);
