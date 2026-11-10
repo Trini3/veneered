@@ -1,0 +1,15 @@
+{
+	"schemaVersion": 1,
+	"id": "veneer-gametest",
+	"version": "0.1.0",
+	"name": "Veneer Game Tests",
+	"environment": "client",
+	"entrypoints": {
+		"fabric-client-gametest": [
+			"io.github.trini3.veneer.gametest.VeneerClientGameTest"
+		]
+	},
+	"depends": {
+		"veneer": "*"
+	}
+}

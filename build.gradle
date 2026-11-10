@@ -79,3 +79,15 @@ publishing {
 		// retrieving dependencies.
 	}
 }
+
+// Automated in-game tests: `./gradlew runClientGameTest` (use xvfb-run on a headless machine).
+// The test mod lives in src/gametest and is not shipped in the jar.
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = "veneer-gametest"
+		enableGameTests = false
+		enableClientGameTests = true
+		eula = true
+	}
+}

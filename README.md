@@ -45,3 +45,10 @@ Requires JDK 25.
 | 2 Frame Trapdoor | 6 frame blocks, 3 wide by 2 tall |
 | Frame Pressure Plate | 2 frame blocks side by side |
 | Frame Button | 1 frame block |
+
+## Automated test
+
+`./gradlew runClientGameTest` starts a real client, places every frame shape, fills them (including a real
+right-click and sneak-right-click), checks the data syncs to the client and that breaking a frame drops its block,
+then saves screenshots to `build/run/clientGameTest/screenshots`. On a headless Linux box, run it under
+`xvfb-run` with Mesa's Vulkan driver (`mesa-vulkan-drivers`) installed.
