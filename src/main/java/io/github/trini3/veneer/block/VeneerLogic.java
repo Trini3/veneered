@@ -8,6 +8,7 @@ import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -116,5 +117,21 @@ public final class VeneerLogic {
 				loc.y - pos.getY() - dir.getStepY() * 0.01,
 				loc.z - pos.getZ() - dir.getStepZ() * 0.01
 		};
+	}
+
+	/**
+	 * Destroy progress per tick for a frame: if it holds anything, it mines exactly like the hardest held block
+	 * (hardness, tool speed, and the slow-down for lacking the correct tool). An empty frame mines like the frame.
+	 */
+	public static float destroyProgress(Player player, BlockGetter level, BlockPos pos, float frameProgress) {
+		if (level.getBlockEntity(pos) instanceof VeneerBlockEntity frame) {
+			BlockState hardest = frame.hardest(level, pos);
+
+			if (hardest != null) {
+				return hardest.getDestroyProgress(player, level, pos);
+			}
+		}
+
+		return frameProgress;
 	}
 }

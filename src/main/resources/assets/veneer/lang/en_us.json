@@ -1,7 +1,7 @@
 {
   "block.veneer.frame_block": "Frame Block",
   "block.veneer.frame_slab": "Frame Slab",
-  "block.veneer.frame_panel": "Frame Panel",
+  "block.veneer.frame_panel": "Frame Vertical Slab",
   "block.veneer.frame_stairs": "Frame Stairs",
   "block.veneer.frame_wall": "Frame Wall",
   "block.veneer.frame_fence": "Frame Fence",

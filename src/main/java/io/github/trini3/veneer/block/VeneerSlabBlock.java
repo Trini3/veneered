@@ -18,6 +18,7 @@ import net.minecraft.world.phys.BlockHitResult;
 public class VeneerSlabBlock extends SlabBlock implements EntityBlock, VeneerHolder {
 	public VeneerSlabBlock(BlockBehaviour.Properties properties) {
 		super(properties);
+		registerDefaultState(VeneerProps.defaults(defaultBlockState()));
 	}
 
 	@Override
@@ -54,5 +55,28 @@ public class VeneerSlabBlock extends SlabBlock implements EntityBlock, VeneerHol
 			case TOP -> 1;
 			case DOUBLE -> y > 0.5F ? 1 : 0;
 		};
+	}
+
+	/** Mines like the hardest block inside the frame: same hardness, same preferred tool, same correct-tool rule. */
+	@Override
+	protected float getDestroyProgress(BlockState state, Player player, net.minecraft.world.level.BlockGetter level, BlockPos pos) {
+		return VeneerLogic.destroyProgress(player, level, pos, super.getDestroyProgress(state, player, level, pos));
+	}
+
+	@Override
+	protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
+		builder.add(VeneerProps.LIGHT, VeneerProps.OPAQUE);
+	}
+
+	/** Only hides neighbouring faces and blocks light when the held block would. */
+	@Override
+	protected net.minecraft.world.phys.shapes.VoxelShape getOcclusionShape(BlockState state) {
+		return state.getValue(VeneerProps.OPAQUE) ? super.getOcclusionShape(state) : net.minecraft.world.phys.shapes.Shapes.empty();
+	}
+
+	@Override
+	protected boolean propagatesSkylightDown(BlockState state) {
+		return !state.getValue(VeneerProps.OPAQUE) || super.propagatesSkylightDown(state);
 	}
 }

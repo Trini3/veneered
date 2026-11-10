@@ -31,10 +31,10 @@ public final class VeneerRegistry {
 	private static final List<Block> FRAMES = new ArrayList<>();
 	private static final List<Item> ITEMS = new ArrayList<>();
 
-	public static final Block FRAME_BLOCK = register("frame_block", VeneerFullBlock::new, props(Blocks.OAK_PLANKS));
-	public static final Block FRAME_SLAB = register("frame_slab", VeneerSlabBlock::new, props(Blocks.OAK_SLAB));
-	public static final Block FRAME_PANEL = register("frame_panel", VeneerPanelBlock::new, props(Blocks.OAK_SLAB));
-	public static final Block FRAME_STAIRS = register("frame_stairs", p -> new VeneerStairBlock(Blocks.OAK_PLANKS.defaultBlockState(), p), props(Blocks.OAK_STAIRS));
+	public static final Block FRAME_BLOCK = register("frame_block", VeneerFullBlock::new, solidProps(Blocks.OAK_PLANKS));
+	public static final Block FRAME_SLAB = register("frame_slab", VeneerSlabBlock::new, solidProps(Blocks.OAK_SLAB));
+	public static final Block FRAME_PANEL = register("frame_panel", VeneerPanelBlock::new, solidProps(Blocks.OAK_SLAB));
+	public static final Block FRAME_STAIRS = register("frame_stairs", p -> new VeneerStairBlock(Blocks.OAK_PLANKS.defaultBlockState(), p), solidProps(Blocks.OAK_STAIRS));
 	public static final Block FRAME_WALL = register("frame_wall", VeneerWallBlock::new, props(Blocks.OAK_PLANKS).forceSolidOn());
 	public static final Block FRAME_FENCE = register("frame_fence", VeneerFenceBlock::new, props(Blocks.OAK_FENCE));
 	public static final Block FRAME_FENCE_GATE = register("frame_fence_gate", p -> new VeneerFenceGateBlock(WoodType.OAK, p), props(Blocks.OAK_FENCE_GATE));
@@ -54,9 +54,19 @@ public final class VeneerRegistry {
 	private VeneerRegistry() {
 	}
 
-	/** Frames copy their vanilla oak counterpart's behaviour but never occlude, since they can look like glass. */
+	/**
+	 * Thin shapes copy their vanilla oak counterpart and never occlude. They glow like the block inside.
+	 */
 	private static BlockBehaviour.Properties props(Block base) {
-		return BlockBehaviour.Properties.ofFullCopy(base).noOcclusion();
+		return BlockBehaviour.Properties.ofFullCopy(base).noOcclusion().lightLevel(state -> state.getValue(VeneerProps.LIGHT));
+	}
+
+	/**
+	 * Solid shapes (block, slab, vertical slab, stairs) can occlude: whether they do depends on the block inside,
+	 * see {@link VeneerProps#OPAQUE}.
+	 */
+	private static BlockBehaviour.Properties solidProps(Block base) {
+		return BlockBehaviour.Properties.ofFullCopy(base).lightLevel(state -> state.getValue(VeneerProps.LIGHT));
 	}
 
 	private static Block register(String name, Function<BlockBehaviour.Properties, Block> factory, BlockBehaviour.Properties properties) {

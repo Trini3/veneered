@@ -22,6 +22,7 @@ import io.github.trini3.veneer.VeneerRegistry;
 import io.github.trini3.veneer.block.Appearance;
 import io.github.trini3.veneer.block.VeneerBlockEntity;
 import io.github.trini3.veneer.block.VeneerPanelBlock;
+import io.github.trini3.veneer.block.VeneerProps;
 
 /**
  * Places every frame shape, fills them (some through real right-click input, the rest directly), checks the
@@ -137,9 +138,65 @@ public class VeneerClientGameTest implements FabricClientGameTest {
 					.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(breakPos).inflate(2))
 					.stream().filter(it -> it.getItem().is(Items.GRASS_BLOCK)).mapToInt(it -> it.getItem().getCount()).sum());
 
-			if (grass != 1) {
-				throw new AssertionError("Expected the broken frame to drop 1 grass block, got " + grass);
+			int frames = sp.getServer().computeOnServer(server -> sp.getConnection().getServerLevel()
+					.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(breakPos).inflate(2))
+					.stream().filter(it -> it.getItem().is(VeneerRegistry.FRAME_BLOCK.asItem())).mapToInt(it -> it.getItem().getCount()).sum());
+
+			if (grass != 1 || frames != 1) {
+				throw new AssertionError("Expected the broken frame to drop 1 grass block and 1 frame, got " + grass + " and " + frames);
 			}
+
+			// --- 4. Frames mine like the hardest block inside them ---
+			BlockPos hardPos = new BlockPos(0, Y, -4);
+			setBlock(sp, hardPos, VeneerRegistry.FRAME_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE));
+			fill(sp, hardPos, Blocks.DIRT, Blocks.OBSIDIAN);
+			sp.getServer().runOnServer(server -> {
+				ServerLevel level = sp.getConnection().getServerLevel();
+				var player = sp.getConnection().getServerPlayer();
+				player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+				float frame = level.getBlockState(hardPos).getDestroyProgress(player, level, hardPos);
+				float obsidian = Blocks.OBSIDIAN.defaultBlockState().getDestroyProgress(player, level, hardPos);
+
+				if (Math.abs(frame - obsidian) > 1e-6) {
+					throw new AssertionError("Expected obsidian-filled frame to mine like obsidian: " + frame + " vs " + obsidian);
+				}
+
+				player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIAMOND_PICKAXE));
+				float framePick = level.getBlockState(hardPos).getDestroyProgress(player, level, hardPos);
+				float obsidianPick = Blocks.OBSIDIAN.defaultBlockState().getDestroyProgress(player, level, hardPos);
+
+				if (Math.abs(framePick - obsidianPick) > 1e-6 || framePick <= frame) {
+					throw new AssertionError("Expected a diamond pickaxe to mine it like obsidian: " + framePick + " vs " + obsidianPick);
+				}
+			});
+
+			// --- 5. Frames take light emission and opacity from the block inside ---
+			BlockPos glowPos = new BlockPos(4, Y, -4);
+			BlockPos glassPos = new BlockPos(6, Y, -4);
+			setBlock(sp, glowPos, VeneerRegistry.FRAME_BLOCK.defaultBlockState());
+			setBlock(sp, glassPos, VeneerRegistry.FRAME_BLOCK.defaultBlockState());
+			fill(sp, glowPos, Blocks.GLOWSTONE, null);
+			fill(sp, glassPos, Blocks.GLASS, null);
+			context.waitTicks(10);
+			sp.getServer().runOnServer(server -> {
+				ServerLevel level = sp.getConnection().getServerLevel();
+				BlockState glow = level.getBlockState(glowPos);
+				BlockState glass = level.getBlockState(glassPos);
+				BlockState stone = level.getBlockState(hardPos);
+				int lightAbove = level.getBrightness(net.minecraft.world.level.LightLayer.BLOCK, glowPos.above());
+
+				if (glow.getLightEmission() != 15 || lightAbove < 14) {
+					throw new AssertionError("Glowstone frame should glow: emission " + glow.getLightEmission() + ", light above " + lightAbove);
+				}
+
+				if (glass.getValue(VeneerProps.OPAQUE) || !glass.propagatesSkylightDown()) {
+					throw new AssertionError("Glass frame should let light through: " + glass);
+				}
+
+				if (!stone.getValue(VeneerProps.OPAQUE) || stone.propagatesSkylightDown()) {
+					throw new AssertionError("Obsidian/dirt frame should block light: " + stone);
+				}
+			});
 		}
 	}
 

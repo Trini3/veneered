@@ -7,6 +7,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -33,6 +34,31 @@ public class VeneerBlockEntity extends BlockEntity implements RenderDataBlockEnt
 		return slots[slot];
 	}
 
+	/** The held block that takes longest to mine (unbreakable blocks count as hardest), or null when empty. */
+	public @Nullable BlockState hardest(BlockGetter level, BlockPos pos) {
+		BlockState best = null;
+		float bestSpeed = 0;
+
+		for (BlockState slot : slots) {
+			if (slot == null) {
+				continue;
+			}
+
+			float speed = slot.getDestroySpeed(level, pos);
+
+			if (speed < 0) {
+				speed = Float.MAX_VALUE;
+			}
+
+			if (best == null || speed > bestSpeed) {
+				best = slot;
+				bestSpeed = speed;
+			}
+		}
+
+		return best;
+	}
+
 	public boolean isEmpty() {
 		return slots[0] == null && slots[1] == null;
 	}
@@ -45,6 +71,21 @@ public class VeneerBlockEntity extends BlockEntity implements RenderDataBlockEnt
 		slots[slot] = state;
 		updateRenderData();
 		setChanged();
+		syncStateProperties();
+	}
+
+	/** Pushes the held blocks' light and opacity into the frame's block state, where the lighting engine reads them. */
+	private void syncStateProperties() {
+		if (level == null || level.isClientSide()) {
+			return;
+		}
+
+		BlockState current = getBlockState();
+		BlockState updated = VeneerProps.apply(current, slots);
+
+		if (updated != current) {
+			level.setBlock(worldPosition, updated, Block.UPDATE_ALL);
+		}
 	}
 
 	private void updateRenderData() {

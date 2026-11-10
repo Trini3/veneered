@@ -18,6 +18,7 @@ import net.minecraft.world.phys.BlockHitResult;
 public class VeneerFenceGateBlock extends FenceGateBlock implements EntityBlock, VeneerHolder {
 	public VeneerFenceGateBlock(WoodType type, BlockBehaviour.Properties properties) {
 		super(type, properties);
+		registerDefaultState(VeneerProps.defaults(defaultBlockState()));
 	}
 
 	@Override
@@ -35,5 +36,17 @@ public class VeneerFenceGateBlock extends FenceGateBlock implements EntityBlock,
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		InteractionResult result = VeneerLogic.useWithoutItem(this, state, level, pos, player, hit);
 		return result != null ? result : super.useWithoutItem(state, level, pos, player, hit);
+	}
+
+	/** Mines like the hardest block inside the frame: same hardness, same preferred tool, same correct-tool rule. */
+	@Override
+	protected float getDestroyProgress(BlockState state, Player player, net.minecraft.world.level.BlockGetter level, BlockPos pos) {
+		return VeneerLogic.destroyProgress(player, level, pos, super.getDestroyProgress(state, player, level, pos));
+	}
+
+	@Override
+	protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
+		builder.add(VeneerProps.LIGHT);
 	}
 }
