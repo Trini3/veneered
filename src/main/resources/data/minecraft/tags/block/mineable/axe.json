@@ -17,6 +17,7 @@
     "veneer:frame_quarter_slab",
     "veneer:frame_horizontal_quarter",
     "veneer:frame_vertical_quarter",
+    "veneer:frame_eighth",
     "veneer:frame_half_stairs"
   ]
 }

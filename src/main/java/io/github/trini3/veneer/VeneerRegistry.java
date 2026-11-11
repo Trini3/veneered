@@ -40,6 +40,7 @@ public final class VeneerRegistry {
 	public static final Block FRAME_QUARTER_SLAB = register("frame_quarter_slab", VeneerQuarterSlabBlock::new, solidProps(Blocks.OAK_SLAB));
 	public static final Block FRAME_HORIZONTAL_QUARTER = register("frame_horizontal_quarter", VeneerHorizontalQuarterBlock::new, solidProps(Blocks.OAK_SLAB));
 	public static final Block FRAME_VERTICAL_QUARTER = register("frame_vertical_quarter", VeneerVerticalQuarterBlock::new, solidProps(Blocks.OAK_SLAB));
+	public static final Block FRAME_EIGHTH = register("frame_eighth", VeneerEighthBlock::new, solidProps(Blocks.OAK_SLAB));
 	public static final Block FRAME_HALF_STAIRS = register("frame_half_stairs", VeneerHalfStairBlock::new, solidProps(Blocks.OAK_STAIRS));
 	public static final Block FRAME_WALL = register("frame_wall", VeneerWallBlock::new, props(Blocks.OAK_PLANKS).forceSolidOn());
 	public static final Block FRAME_FENCE = register("frame_fence", VeneerFenceBlock::new, props(Blocks.OAK_FENCE));

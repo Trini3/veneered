@@ -29,6 +29,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 import io.github.trini3.veneer.VeneerRegistry;
 import io.github.trini3.veneer.block.VeneerBlockEntity;
 import io.github.trini3.veneer.block.VeneerCornerBlock;
+import io.github.trini3.veneer.block.VeneerEighthBlock;
 import io.github.trini3.veneer.block.VeneerHalfStairBlock;
 import io.github.trini3.veneer.block.VeneerHorizontalQuarterBlock;
 import io.github.trini3.veneer.block.VeneerQuarterSlabBlock;
@@ -187,6 +188,14 @@ public class VeneerShowcaseGameTest implements FabricClientGameTest {
 		put(16, 28, hs.setValue(VeneerHalfStairBlock.DOUBLE, true), Blocks.STONE_BRICKS, Blocks.OAK_PLANKS);
 		put(18, 28, hs.setValue(VeneerHalfStairBlock.DOUBLE, true).setValue(VeneerHalfStairBlock.TOP, true), Blocks.POLISHED_GRANITE, Blocks.POLISHED_DIORITE);
 
+		// Eighth blocks: one empty, then one in each corner, alternating bottom and top.
+		BlockState eighth = VeneerRegistry.FRAME_EIGHTH.defaultBlockState();
+		put(12, 24, eighth, null);
+		put(20, 28, eighth.setValue(VeneerEighthBlock.FACING, Direction.NORTH), Blocks.GOLD_BLOCK);
+		put(21, 28, eighth.setValue(VeneerEighthBlock.FACING, Direction.EAST).setValue(VeneerEighthBlock.TOP, true), Blocks.OAK_PLANKS);
+		put(22, 28, eighth.setValue(VeneerEighthBlock.FACING, Direction.SOUTH), Blocks.GRASS_BLOCK);
+		put(23, 28, eighth.setValue(VeneerEighthBlock.FACING, Direction.WEST).setValue(VeneerEighthBlock.TOP, true), Blocks.BRICKS);
+
 				try (TestSingleplayerContext sp = context.worldBuilder().create()) {
 			sp.getConnection().waitForChunksRender();
 			sp.getServer().runCommand("gamemode spectator @a");
@@ -240,6 +249,7 @@ public class VeneerShowcaseGameTest implements FabricClientGameTest {
 			shot(context, sp, "showcase_small_shapes_empty", 5.5, 3, 20.5, 0, 30);
 			shot(context, sp, "showcase_small_shapes_left", 5.5, 3, 32.5, 180, 30);
 			shot(context, sp, "showcase_small_shapes_right", 14.5, 3, 32.5, 180, 30);
+			shot(context, sp, "showcase_eighths", 21.5, 2, 31, 180, 30);
 
 			sp.getServer().runCommand("time set midnight");
 			context.waitTicks(20);

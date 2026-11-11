@@ -18,7 +18,7 @@ Make dirt doors, grass walls, glass stairs, or a slab that is half stone and hal
 
 ### Shapes
 
-Frame Block, Slab, Vertical Slab, Corner Block, Corner Slab, Quarter Slab (a quarter-height layer), Horizontal Quarter (half a slab), Vertical Quarter (a quarter-block pillar), Stairs, Half Stairs, Wall, Fence, Fence Gate, Door, Trapdoor, Pressure Plate, Button.
+Frame Block, Slab, Vertical Slab, Corner Block, Corner Slab, Quarter Slab (a quarter-height layer), Horizontal Quarter (half a slab), Vertical Quarter (a quarter-block pillar), Eighth Block (a half-size cube in one corner), Stairs, Half Stairs, Wall, Fence, Fence Gate, Door, Trapdoor, Pressure Plate, Button.
 
 ### Two-tone blocks
 
@@ -61,7 +61,7 @@ Requires JDK 25.
 ## Recipes
 
 - **16 Frame Block**: 8 sticks around 1 plank (any wood).
-- **Stonecutter** (1 frame block): 2 slabs, 2 vertical slabs, 1 corner block, 2 corner slabs, 4 quarter slabs, 4 horizontal quarters, 4 vertical quarters, 1 stairs, 2 half stairs, 1 wall, 1 fence, 1 fence gate, 1 door, 1 trapdoor, 2 pressure plates, 4 buttons.
+- **Stonecutter** (1 frame block): 2 slabs, 2 vertical slabs, 1 corner block, 2 corner slabs, 4 quarter slabs, 4 horizontal quarters, 4 vertical quarters, 8 eighth blocks, 1 stairs, 2 half stairs, 1 wall, 1 fence, 1 fence gate, 1 door, 1 trapdoor, 2 pressure plates, 4 buttons.
 - **Crafting table**, vanilla patterns using frame blocks in place of planks: slab (3 → 6), stairs (6 → 4), wall (6 → 6), fence (with sticks, → 3), fence gate (with sticks), door (6 → 3), trapdoor (6 → 2), pressure plate (2 → 1), button (1 → 1).
 
 ## Automated test

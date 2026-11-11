@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "veneer:frame_block",
+  "result": {
+    "id": "veneer:frame_eighth",
+    "count": 8
+  }
+}

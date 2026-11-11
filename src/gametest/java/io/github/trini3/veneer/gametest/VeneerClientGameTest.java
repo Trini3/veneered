@@ -100,6 +100,30 @@ public class VeneerClientGameTest implements FabricClientGameTest {
 			});
 			setBlock(sp, cornerPos, Blocks.AIR.defaultBlockState());
 
+			// Eighth blocks go in the corner you click: aim at the north-west quarter of the floor in front.
+			sp.getServer().runOnServer(server -> sp.getConnection().getServerPlayer().setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(VeneerRegistry.FRAME_EIGHTH)));
+			context.waitTicks(5);
+			{
+				double dx = 0.25 - 0.2;
+				double dy = -1.62;
+				double dz = 2.25 - 0.5;
+				float yaw = (float) Math.toDegrees(Math.atan2(dz, dx)) - 90;
+				float pitch = (float) -Math.toDegrees(Math.atan2(dy, Math.hypot(dx, dz)));
+				context.getInput().lookAt(yaw, pitch);
+			}
+			context.waitTick();
+			context.getInput().pressKey(options -> options.keyUse);
+			context.waitTicks(5);
+			sp.getServer().runOnServer(server -> {
+				BlockState placed = sp.getConnection().getServerLevel().getBlockState(cornerPos);
+
+				if (!placed.is(VeneerRegistry.FRAME_EIGHTH) || placed.getValue(io.github.trini3.veneer.block.VeneerEighthBlock.FACING) != Direction.WEST
+						|| placed.getValue(io.github.trini3.veneer.block.VeneerEighthBlock.TOP)) {
+					throw new AssertionError("Expected a bottom eighth block in the north-west corner, got " + placed);
+				}
+			});
+			setBlock(sp, cornerPos, Blocks.AIR.defaultBlockState());
+
 			// --- 2. Showcase row: every shape, filled directly ---
 			BlockState slabDouble = VeneerRegistry.FRAME_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
 			BlockState panelDouble = VeneerRegistry.FRAME_PANEL.defaultBlockState().setValue(VeneerPanelBlock.FACING, Direction.SOUTH).setValue(VeneerPanelBlock.DOUBLE, true);
