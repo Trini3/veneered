@@ -66,6 +66,12 @@ Requires JDK 25.
 - **16 Frame Panel**: 6 frame blocks in two rows (or 2 from the stonecutter).
 - **Crafting table**, vanilla patterns using frame blocks in place of planks: slab (3 → 6), stairs (6 → 4), wall (6 → 6), fence (with sticks, → 3), fence gate (with sticks), door (6 → 3), trapdoor (6 → 2), pressure plate (2 → 1), button (1 → 1).
 
+## Known issues
+
+- **Fixed 2026-11-14:** a Frame Panel build shared as a zip stopped worlds from loading. Its jar was built before the recipe fix and still used `"category": "decorations"`, which 26.3 rejects for crafting recipes (use `misc`, `building`, `redstone` or `equipment`). The GitHub Actions build was never affected.
+- **Releasing:** ship jars only through `tools/package.sh`. It rebuilds the jar and refuses to copy it if its resources differ from the source. `runClientGameTest` does not rebuild `build/libs`.
+- **26.3 data formats:** loot tables use `condition` / `modifier` / `minecraft:match_block`. The older `conditions` / `functions` / `block_state_property` keys are silently ignored.
+
 ## Automated test
 
 `./gradlew runClientGameTest` starts a real client, places every frame shape, fills them (including a real
