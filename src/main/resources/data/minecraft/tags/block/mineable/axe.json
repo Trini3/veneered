@@ -18,6 +18,10 @@
     "veneer:frame_horizontal_quarter",
     "veneer:frame_vertical_quarter",
     "veneer:frame_eighth",
-    "veneer:frame_half_stairs"
+    "veneer:frame_half_stairs",
+    "veneer:frame_pane",
+    "veneer:glowing_frame_block",
+    "veneer:glowing_frame_slab",
+    "veneer:glowing_frame_stairs"
   ]
 }

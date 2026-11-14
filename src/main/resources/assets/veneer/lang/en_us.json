@@ -17,5 +17,9 @@
   "block.veneer.frame_horizontal_quarter": "Frame Horizontal Quarter",
   "block.veneer.frame_vertical_quarter": "Frame Vertical Quarter",
   "block.veneer.frame_eighth": "Frame Eighth Block",
-  "block.veneer.frame_half_stairs": "Frame Half Stairs"
+  "block.veneer.frame_half_stairs": "Frame Half Stairs",
+  "block.veneer.frame_pane": "Frame Panel",
+  "block.veneer.glowing_frame_block": "Glowing Frame Block",
+  "block.veneer.glowing_frame_slab": "Glowing Frame Slab",
+  "block.veneer.glowing_frame_stairs": "Glowing Frame Stairs"
 }

@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "veneer:frame_stairs"
+    "veneer:frame_stairs",
+    "veneer:glowing_frame_stairs"
   ]
 }

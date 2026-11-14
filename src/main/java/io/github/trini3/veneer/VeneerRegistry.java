@@ -49,6 +49,12 @@ public final class VeneerRegistry {
 	public static final Block FRAME_TRAPDOOR = register("frame_trapdoor", p -> new VeneerTrapDoorBlock(BlockSetType.OAK, p), props(Blocks.OAK_TRAPDOOR));
 	public static final Block FRAME_PRESSURE_PLATE = register("frame_pressure_plate", p -> new VeneerPressurePlateBlock(BlockSetType.OAK, p), props(Blocks.OAK_PRESSURE_PLATE));
 	public static final Block FRAME_BUTTON = register("frame_button", p -> new VeneerButtonBlock(BlockSetType.OAK, 30, p), props(Blocks.OAK_BUTTON));
+	public static final Block FRAME_PANE = register("frame_pane", VeneerPaneBlock::new, props(Blocks.OAK_FENCE));
+
+	// Glowing frames always give off glowstone-level light, whatever they hold.
+	public static final Block GLOWING_FRAME_BLOCK = register("glowing_frame_block", VeneerFullBlock::new, glowing(solidProps(Blocks.OAK_PLANKS)));
+	public static final Block GLOWING_FRAME_SLAB = register("glowing_frame_slab", VeneerSlabBlock::new, glowing(solidProps(Blocks.OAK_SLAB)));
+	public static final Block GLOWING_FRAME_STAIRS = register("glowing_frame_stairs", p -> new VeneerStairBlock(Blocks.OAK_PLANKS.defaultBlockState(), p), glowing(solidProps(Blocks.OAK_STAIRS)));
 
 	public static final BlockEntityType<VeneerBlockEntity> VENEER_BLOCK_ENTITY = Registry.register(
 			BuiltInRegistries.BLOCK_ENTITY_TYPE,
@@ -74,6 +80,10 @@ public final class VeneerRegistry {
 	 */
 	private static BlockBehaviour.Properties solidProps(Block base) {
 		return BlockBehaviour.Properties.ofFullCopy(base).lightLevel(VeneerProps::lightLevel);
+	}
+
+	private static BlockBehaviour.Properties glowing(BlockBehaviour.Properties properties) {
+		return properties.lightLevel(state -> 15);
 	}
 
 	private static Block register(String name, Function<BlockBehaviour.Properties, Block> factory, BlockBehaviour.Properties properties) {

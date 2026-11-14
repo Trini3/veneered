@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "veneer:glowing_frame_block",
+  "result": {
+    "id": "veneer:glowing_frame_stairs",
+    "count": 1
+  }
+}

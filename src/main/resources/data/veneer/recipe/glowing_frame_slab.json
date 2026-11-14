@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "GGG"
+  ],
+  "key": {
+    "G": "veneer:glowing_frame_block"
+  },
+  "result": {
+    "id": "veneer:glowing_frame_slab",
+    "count": 6
+  }
+}

@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "veneer:frame_slab"
+    "veneer:frame_slab",
+    "veneer:glowing_frame_slab"
   ]
 }

@@ -322,6 +322,25 @@ public class VeneerClientGameTest implements FabricClientGameTest {
 					throw new AssertionError("Obsidian/dirt frame should block light: " + stone);
 				}
 			});
+
+			// --- 6. Glowing frames always glow; the pane frame accepts a block ---
+			BlockPos glowingPos = new BlockPos(8, Y, -4);
+			BlockPos panePos = new BlockPos(10, Y, -4);
+			setBlock(sp, glowingPos, VeneerRegistry.GLOWING_FRAME_SLAB.defaultBlockState());
+			setBlock(sp, panePos, VeneerRegistry.FRAME_PANE.defaultBlockState());
+			fill(sp, glowingPos, Blocks.DIRT, null);
+			fill(sp, panePos, Blocks.GLASS, null);
+			context.waitTicks(10);
+			sp.getServer().runOnServer(server -> {
+				ServerLevel level = sp.getConnection().getServerLevel();
+				int emission = level.getBlockState(glowingPos).getLightEmission();
+				int emptyEmission = VeneerRegistry.GLOWING_FRAME_BLOCK.defaultBlockState().getLightEmission();
+
+				if (emission != 15 || emptyEmission != 15) {
+					throw new AssertionError("Glowing frames should emit 15 (filled with dirt: " + emission + ", empty: " + emptyEmission + ")");
+				}
+			});
+			assertSlot(sp, panePos, 0, Blocks.GLASS);
 		}
 	}
 

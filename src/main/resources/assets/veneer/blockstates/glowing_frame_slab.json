@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "veneer:block/glowing_frame_slab"
+    },
+    "type=top": {
+      "model": "veneer:block/glowing_frame_slab_top"
+    },
+    "type=double": {
+      "model": "veneer:block/glowing_frame_slab_double"
+    }
+  }
+}

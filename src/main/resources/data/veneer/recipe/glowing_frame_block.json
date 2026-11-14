@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "FFF",
+    "FGF",
+    "FFF"
+  ],
+  "key": {
+    "F": "veneer:frame_block",
+    "G": "minecraft:glowstone"
+  },
+  "result": {
+    "id": "veneer:glowing_frame_block",
+    "count": 8
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/template_glass_pane_side",
+  "textures": {
+    "edge": "veneer:block/frame",
+    "pane": "veneer:block/frame",
+    "particle": "veneer:block/frame"
+  }
+}
