@@ -39,6 +39,16 @@ public class VeneerClientGameTest implements FabricClientGameTest {
 
 		try (TestSingleplayerContext sp = context.worldBuilder().create()) {
 			sp.getConnection().waitForChunksRender();
+
+			// --- 0. Every Veneer recipe file loaded (a bad one can stop worlds from loading, or be skipped) ---
+			sp.getServer().runOnServer(server -> {
+				long files = server.getResourceManager().listResources("recipe", id -> id.getNamespace().equals("veneer") && id.getPath().endsWith(".json")).size();
+				long loaded = server.getRecipeManager().getRecipes().stream().filter(r -> r.id().identifier().getNamespace().equals("veneer")).count();
+
+				if (files == 0 || loaded != files) {
+					throw new AssertionError("Loaded " + loaded + " Veneer recipes out of " + files + " recipe files");
+				}
+			});
 			sp.getServer().runCommand("gamemode creative @a");
 			sp.getServer().runCommand("time set noon");
 			sp.getServer().runCommand("gamerule advance_time false");
