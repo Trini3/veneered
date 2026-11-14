@@ -206,6 +206,71 @@ public class VeneerClientGameTest implements FabricClientGameTest {
 				throw new AssertionError("Expected the broken frame to drop 1 grass block and 1 frame, got " + grass + " and " + frames);
 			}
 
+			// --- 3b. Breaking a filled frame in creative drops nothing (a real left-click) ---
+			BlockPos creativePos = new BlockPos(0, Y, 2);
+			sp.getServer().runCommand("kill @e[type=item]");
+			setBlock(sp, creativePos, VeneerRegistry.FRAME_BLOCK.defaultBlockState());
+			fill(sp, creativePos, Blocks.GRASS_BLOCK, null);
+			sp.getServer().runCommand("gamemode creative @a");
+			sp.getServer().runCommand("tp @a 0.5 %d 0.5 0 0".formatted(Y));
+			context.waitTicks(5);
+			context.getInput().lookAt(creativePos);
+			context.waitTick();
+			context.getInput().pressKey(options -> options.keyAttack);
+			context.waitTicks(5);
+			sp.getServer().runOnServer(server -> {
+				ServerLevel level = sp.getConnection().getServerLevel();
+
+				if (!level.getBlockState(creativePos).isAir()) {
+					throw new AssertionError("Expected the creative left-click to break the frame, got " + level.getBlockState(creativePos));
+				}
+
+				int dropped = level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(creativePos).inflate(3)).size();
+
+				if (dropped != 0) {
+					throw new AssertionError("Expected no drops from a creative break, got " + dropped + " item(s)");
+				}
+			});
+
+			// Same for a door broken from its upper half (the lower half is the one holding the drops).
+			sp.getServer().runOnServer(server -> {
+				ServerLevel level = sp.getConnection().getServerLevel();
+				BlockState lower = VeneerRegistry.FRAME_DOOR.defaultBlockState();
+				level.setBlock(creativePos, lower, Block.UPDATE_CLIENTS);
+				level.setBlock(creativePos.above(), lower.setValue(net.minecraft.world.level.block.DoorBlock.HALF, net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER), Block.UPDATE_CLIENTS);
+			});
+			fill(sp, creativePos, Blocks.DIRT, null);
+			context.waitTicks(10);
+			sp.getServer().runOnServer(server -> {
+				// Loot tables: only the lower door half drops the door, and a double slab drops two slabs.
+				ServerLevel level = sp.getConnection().getServerLevel();
+				var upperDrops = Block.getDrops(level.getBlockState(creativePos.above()), level, creativePos.above(), level.getBlockEntity(creativePos.above()));
+				var lowerDrops = Block.getDrops(level.getBlockState(creativePos), level, creativePos, level.getBlockEntity(creativePos));
+				var slabDrops = Block.getDrops(VeneerRegistry.FRAME_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE), level, creativePos, null);
+
+				if (!upperDrops.isEmpty() || lowerDrops.size() != 1 || slabDrops.size() != 1 || slabDrops.getFirst().getCount() != 2) {
+					throw new AssertionError("Unexpected loot: upper door " + upperDrops + ", lower door " + lowerDrops + ", double slab " + slabDrops);
+				}
+			});
+			context.getInput().lookAt(creativePos.above());
+			context.waitTick();
+			context.getInput().pressKey(options -> options.keyAttack);
+			context.waitTicks(5);
+			sp.getServer().runOnServer(server -> {
+				ServerLevel level = sp.getConnection().getServerLevel();
+
+				if (!level.getBlockState(creativePos).isAir() || !level.getBlockState(creativePos.above()).isAir()) {
+					throw new AssertionError("Expected the creative left-click to remove both door halves");
+				}
+
+				var dropped = level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(creativePos).inflate(3));
+
+				if (!dropped.isEmpty()) {
+					throw new AssertionError("Expected no drops from a creative door break, got " + dropped.stream().map(it -> it.getItem().toString()).toList());
+				}
+			});
+			sp.getServer().runCommand("gamemode survival @a");
+
 			// --- 4. Frames mine like the hardest block inside them ---
 			BlockPos hardPos = new BlockPos(0, Y, -4);
 			setBlock(sp, hardPos, VeneerRegistry.FRAME_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE));

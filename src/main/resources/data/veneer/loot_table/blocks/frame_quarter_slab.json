@@ -2,18 +2,16 @@
   "type": "minecraft:block",
   "pools": [
     {
-      "rolls": 1,
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
       "entries": [
         {
           "type": "minecraft:item",
           "name": "veneer:frame_quarter_slab"
         }
       ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
-      ]
+      "rolls": 1
     }
   ],
   "random_sequence": "veneer:blocks/frame_quarter_slab"

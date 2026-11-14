@@ -2,25 +2,23 @@
   "type": "minecraft:block",
   "pools": [
     {
-      "rolls": 1,
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "veneer:frame_door"
-        }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        },
-        {
-          "condition": "minecraft:block_state_property",
-          "block": "veneer:frame_door",
-          "properties": {
-            "half": "lower"
+          "name": "veneer:frame_door",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "veneer:frame_door",
+            "state": {
+              "half": "lower"
+            }
           }
         }
-      ]
+      ],
+      "rolls": 1
     }
   ],
   "random_sequence": "veneer:blocks/frame_door"

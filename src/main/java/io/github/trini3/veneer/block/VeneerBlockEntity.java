@@ -25,6 +25,8 @@ import io.github.trini3.veneer.VeneerRegistry;
 public class VeneerBlockEntity extends BlockEntity implements RenderDataBlockEntity {
 	private final @Nullable BlockState[] slots = new BlockState[2];
 	private @Nullable Appearance renderData = null;
+	/** Game time of a creative-mode break of this frame; its contents aren't dropped during that tick. */
+	private long noDropsTick = Long.MIN_VALUE;
 
 	public VeneerBlockEntity(BlockPos pos, BlockState state) {
 		super(VeneerRegistry.VENEER_BLOCK_ENTITY, pos, state);
@@ -133,6 +135,13 @@ public class VeneerBlockEntity extends BlockEntity implements RenderDataBlockEnt
 		}
 	}
 
+	/** Called when a creative player starts breaking this frame, so it is removed without dropping its contents. */
+	public void skipDropsThisTick() {
+		if (level != null) {
+			noDropsTick = level.getGameTime();
+		}
+	}
+
 	@Override
 	public void preRemoveSideEffects(BlockPos pos, BlockState state) {
 		super.preRemoveSideEffects(pos, state);
@@ -142,7 +151,7 @@ public class VeneerBlockEntity extends BlockEntity implements RenderDataBlockEnt
 			return;
 		}
 
-		if (level != null && !level.isClientSide()) {
+		if (level != null && !level.isClientSide() && level.getGameTime() != noDropsTick) {
 			for (BlockState slot : slots) {
 				if (slot != null) {
 					Block.popResource(level, pos, new ItemStack(slot.getBlock()));

@@ -2,34 +2,29 @@
   "type": "minecraft:block",
   "pools": [
     {
-      "rolls": 1,
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
       "entries": [
         {
           "type": "minecraft:item",
           "name": "veneer:frame_slab",
-          "functions": [
+          "modifier": [
             {
-              "function": "minecraft:set_count",
-              "count": 2,
-              "add": false,
-              "conditions": [
-                {
-                  "condition": "minecraft:block_state_property",
-                  "block": "veneer:frame_slab",
-                  "properties": {
-                    "type": "double"
-                  }
+              "type": "minecraft:set_count",
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "veneer:frame_slab",
+                "state": {
+                  "type": "double"
                 }
-              ]
+              },
+              "count": 2
             }
           ]
         }
       ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
-      ]
+      "rolls": 1
     }
   ],
   "random_sequence": "veneer:blocks/frame_slab"
