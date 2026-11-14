@@ -5,7 +5,7 @@ Make dirt doors, grass walls, glass stairs, or a slab that is half stone and hal
 
 ## How it works
 
-- Craft **16 Frame Blocks** from 8 sticks around one plank. Put a frame block in a **stonecutter** to get any shape, or craft the usual shapes (slabs, stairs, walls, fences, gates, doors, trapdoors, pressure plates, buttons) with their normal vanilla patterns.
+- Craft **16 Frame Blocks** from 8 sticks around one plank. Put a frame block in a **stonecutter** to get any shape, or craft the usual shapes (slabs, stairs, walls, fences, gates, doors, pressure plates, buttons) with their normal vanilla patterns. Trapdoors use a 2×2 square instead, so they don't clash with walls.
 - **Right-click a frame with a block** to make the frame look like that block. The block is used up and given back when you change or remove it.
 - **Sneak + right-click with an empty hand** to take the block back out.
 - Breaking a frame drops the empty frame and the blocks that were inside as separate items.
@@ -63,13 +63,14 @@ Requires JDK 25.
 - **16 Frame Block**: 8 sticks around 1 plank (any wood).
 - **Stonecutter** (1 frame block): 2 slabs, 2 vertical slabs, 1 corner block, 2 corner slabs, 4 quarter slabs, 4 horizontal quarters, 4 vertical quarters, 8 eighth blocks, 1 stairs, 2 half stairs, 1 wall, 1 fence, 1 fence gate, 1 door, 1 trapdoor, 2 pressure plates, 4 buttons.
 - **8 Glowing Frame Block**: 8 frame blocks around 1 glowstone. Glowing slabs and stairs come from the stonecutter (2 slabs, 1 stairs) or the usual slab/stairs patterns.
-- **16 Frame Panel**: 6 frame blocks in two rows (or 2 from the stonecutter).
-- **Crafting table**, vanilla patterns using frame blocks in place of planks: slab (3 → 6), stairs (6 → 4), wall (6 → 6), fence (with sticks, → 3), fence gate (with sticks), door (6 → 3), trapdoor (6 → 2), pressure plate (2 → 1), button (1 → 1).
+- **8 Frame Panels**: 3 frame blocks in a vertical column (or 2 from the stonecutter).
+- **Crafting table**, vanilla patterns using frame blocks in place of planks: slab (3 → 6), stairs (6 → 4), wall (6 → 6), fence (with sticks, → 3), fence gate (with sticks), door (6 → 3), trapdoor (4 in a 2×2 square → 2), pressure plate (2 → 1), button (1 → 1).
 
 ## Known issues
 
 - **Fixed 2026-11-14:** a Frame Panel build shared as a zip stopped worlds from loading. Its jar was built before the recipe fix and still used `"category": "decorations"`, which 26.3 rejects for crafting recipes (use `misc`, `building`, `redstone` or `equipment`). The GitHub Actions build was never affected.
 - **Releasing:** ship jars only through `tools/package.sh`. It rebuilds the jar and refuses to copy it if its resources differ from the source. `runClientGameTest` does not rebuild `build/libs`.
+- **Fixed 2026-11-14, recipe clashes:** wall, trapdoor and Frame Panel all used two rows of 3 frame blocks, so the crafting table could only ever give one of them. Trapdoor moved to a 2×2 square and the panel to a vertical column of 3; the wall kept the vanilla pattern. Veneer recipes can't clash with vanilla ones because they all take Veneer items. Test 0 in `VeneerClientGameTest` now crafts each Veneer recipe's grid and fails if any other crafting recipe (vanilla included) matches it, so check it after adding a recipe.
 - **26.3 data formats:** loot tables use `condition` / `modifier` / `minecraft:match_block`. The older `conditions` / `functions` / `block_state_property` keys are silently ignored.
 
 ## Automated test

@@ -2,8 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "pattern": [
-    "FFF",
-    "FFF"
+    "FF",
+    "FF"
   ],
   "key": {
     "F": "veneer:frame_block"

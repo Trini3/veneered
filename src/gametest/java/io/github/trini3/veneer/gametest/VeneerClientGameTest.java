@@ -48,6 +48,44 @@ public class VeneerClientGameTest implements FabricClientGameTest {
 				if (files == 0 || loaded != files) {
 					throw new AssertionError("Loaded " + loaded + " Veneer recipes out of " + files + " recipe files");
 				}
+
+				// No two crafting recipes (Veneer's or vanilla's) may match the same grid as a Veneer recipe.
+				var level = server.overworld();
+				var crafting = server.getRecipeManager().getRecipes().stream()
+						.filter(r -> r.value() instanceof net.minecraft.world.item.crafting.CraftingRecipe).toList();
+				List<String> conflicts = new java.util.ArrayList<>();
+
+				for (var holder : crafting) {
+					if (!holder.id().identifier().getNamespace().equals("veneer")) {
+						continue;
+					}
+
+					net.minecraft.world.item.crafting.CraftingInput input;
+
+					if (holder.value() instanceof net.minecraft.world.item.crafting.ShapedRecipe shaped) {
+						List<ItemStack> grid = shaped.getIngredients().stream()
+								.map(slot -> slot.map(ing -> new ItemStack(ing.items().findFirst().orElseThrow().value())).orElse(ItemStack.EMPTY))
+								.toList();
+						input = net.minecraft.world.item.crafting.CraftingInput.of(shaped.getWidth(), shaped.getHeight(), grid);
+					} else {
+						List<ItemStack> items = holder.value().placementInfo().ingredients().stream()
+								.map(ing -> new ItemStack(ing.items().findFirst().orElseThrow().value())).toList();
+						input = net.minecraft.world.item.crafting.CraftingInput.of(items.size(), 1, items);
+					}
+
+					@SuppressWarnings("unchecked")
+					List<String> matching = crafting.stream()
+							.filter(other -> ((net.minecraft.world.item.crafting.Recipe<net.minecraft.world.item.crafting.CraftingInput>) other.value()).matches(input, level))
+							.map(other -> other.id().identifier().toString()).toList();
+
+					if (matching.size() != 1) {
+						conflicts.add(holder.id().identifier() + " -> " + matching);
+					}
+				}
+
+				if (!conflicts.isEmpty()) {
+					throw new AssertionError("Crafting recipe conflicts: " + conflicts);
+				}
 			});
 			sp.getServer().runCommand("gamemode creative @a");
 			sp.getServer().runCommand("time set noon");
