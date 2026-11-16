@@ -22,6 +22,10 @@
     "veneer:frame_pane",
     "veneer:glowing_frame_block",
     "veneer:glowing_frame_slab",
-    "veneer:glowing_frame_stairs"
+    "veneer:glowing_frame_stairs",
+    "veneer:checkered_frame_block",
+    "veneer:half_checkered_frame_block",
+    "veneer:checkered_frame_slab",
+    "veneer:checkered_frame_panel"
   ]
 }

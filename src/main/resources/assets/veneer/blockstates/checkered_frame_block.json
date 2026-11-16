@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "veneer:block/checkered_frame_block"
+    }
+  }
+}

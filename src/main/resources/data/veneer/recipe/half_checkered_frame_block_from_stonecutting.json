@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "veneer:frame_block",
+  "result": {
+    "id": "veneer:half_checkered_frame_block",
+    "count": 1
+  }
+}

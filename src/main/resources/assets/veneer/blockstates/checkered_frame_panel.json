@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "double=false,facing=north": {
+      "model": "veneer:block/checkered_frame_panel_north"
+    },
+    "double=true,facing=north": {
+      "model": "veneer:block/checkered_frame_block"
+    },
+    "double=false,facing=east": {
+      "model": "veneer:block/checkered_frame_panel_east"
+    },
+    "double=true,facing=east": {
+      "model": "veneer:block/checkered_frame_block"
+    },
+    "double=false,facing=south": {
+      "model": "veneer:block/checkered_frame_panel_south"
+    },
+    "double=true,facing=south": {
+      "model": "veneer:block/checkered_frame_block"
+    },
+    "double=false,facing=west": {
+      "model": "veneer:block/checkered_frame_panel_west"
+    },
+    "double=true,facing=west": {
+      "model": "veneer:block/checkered_frame_block"
+    }
+  }
+}

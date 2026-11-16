@@ -22,6 +22,8 @@ import io.github.trini3.veneer.VeneerRegistry;
 import io.github.trini3.veneer.block.Appearance;
 import io.github.trini3.veneer.block.VeneerBlockEntity;
 import io.github.trini3.veneer.block.VeneerPanelBlock;
+import io.github.trini3.veneer.block.Checker;
+import io.github.trini3.veneer.block.VeneerHalfCheckeredBlock;
 import io.github.trini3.veneer.block.VeneerProps;
 
 /**
@@ -171,6 +173,42 @@ public class VeneerClientGameTest implements FabricClientGameTest {
 				}
 			});
 			setBlock(sp, cornerPos, Blocks.AIR.defaultBlockState());
+
+			// Half-checkered blocks put their checkered half on the clicked face: up on a floor, down on a ceiling.
+			sp.getServer().runOnServer(server -> sp.getConnection().getServerPlayer().setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(VeneerRegistry.HALF_CHECKERED_FRAME_BLOCK)));
+			context.waitTicks(5);
+			context.getInput().lookAt(cornerPos.below());
+			context.waitTick();
+			context.getInput().pressKey(options -> options.keyUse);
+			context.waitTicks(5);
+			BlockPos ceilingPos = cornerPos.above(2);
+			setBlock(sp, ceilingPos, Blocks.STONE.defaultBlockState());
+			context.waitFor(client -> client.level.getBlockState(ceilingPos).is(Blocks.STONE));
+			{
+				// Aim at the middle of the stone's bottom face.
+				double dx = 0.5 - 0.2;
+				double dy = 2.0 - 1.62;
+				double dz = 2.5 - 0.5;
+				float yaw = (float) Math.toDegrees(Math.atan2(dz, dx)) - 90;
+				float pitch = (float) -Math.toDegrees(Math.atan2(dy, Math.hypot(dx, dz)));
+				context.getInput().lookAt(yaw, pitch);
+			}
+			context.waitTick();
+			context.getInput().pressKey(options -> options.keyUse);
+			context.waitTicks(5);
+			sp.getServer().runOnServer(server -> {
+				ServerLevel level = sp.getConnection().getServerLevel();
+				BlockState floor = level.getBlockState(cornerPos);
+				BlockState ceiling = level.getBlockState(cornerPos.above());
+
+				if (!floor.is(VeneerRegistry.HALF_CHECKERED_FRAME_BLOCK) || floor.getValue(VeneerHalfCheckeredBlock.FACING) != Direction.UP
+						|| !ceiling.is(VeneerRegistry.HALF_CHECKERED_FRAME_BLOCK) || ceiling.getValue(VeneerHalfCheckeredBlock.FACING) != Direction.DOWN) {
+					throw new AssertionError("Expected half-checkered blocks facing up (floor) and down (ceiling), got " + floor + " and " + ceiling);
+				}
+			});
+			setBlock(sp, cornerPos, Blocks.AIR.defaultBlockState());
+			setBlock(sp, cornerPos.above(), Blocks.AIR.defaultBlockState());
+			setBlock(sp, ceilingPos, Blocks.AIR.defaultBlockState());
 
 			// --- 2. Showcase row: every shape, filled directly ---
 			BlockState slabDouble = VeneerRegistry.FRAME_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
@@ -389,6 +427,76 @@ public class VeneerClientGameTest implements FabricClientGameTest {
 				}
 			});
 			assertSlot(sp, panePos, 0, Blocks.GLASS);
+
+			// --- 7. Checkered frames ---
+			checkCheckerSlots();
+			sp.getServer().runOnServer(server -> {
+				ServerLevel level = sp.getConnection().getServerLevel();
+				BlockState slab = VeneerRegistry.CHECKERED_FRAME_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
+				BlockState panel = VeneerRegistry.CHECKERED_FRAME_PANEL.defaultBlockState().setValue(VeneerPanelBlock.DOUBLE, true);
+				int slabDrops = Block.getDrops(slab, level, BlockPos.ZERO, null).stream().mapToInt(ItemStack::getCount).sum();
+				int panelDrops = Block.getDrops(panel, level, BlockPos.ZERO, null).stream().mapToInt(ItemStack::getCount).sum();
+
+				if (slabDrops != 2 || panelDrops != 2) {
+					throw new AssertionError("Double checkered slab/vertical slab should drop 2, got " + slabDrops + " and " + panelDrops);
+				}
+			});
+
+			// A small checkered floor plus one of each piece, filled with quartz and coal blocks.
+			List<BlockState> pieces = List.of(
+					VeneerRegistry.CHECKERED_FRAME_BLOCK.defaultBlockState(),
+					VeneerRegistry.CHECKERED_FRAME_BLOCK.defaultBlockState(),
+					VeneerRegistry.HALF_CHECKERED_FRAME_BLOCK.defaultBlockState(),
+					VeneerRegistry.HALF_CHECKERED_FRAME_BLOCK.defaultBlockState().setValue(VeneerHalfCheckeredBlock.FACING, Direction.NORTH),
+					VeneerRegistry.CHECKERED_FRAME_SLAB.defaultBlockState(),
+					VeneerRegistry.CHECKERED_FRAME_PANEL.defaultBlockState(),
+					VeneerRegistry.CHECKERED_FRAME_BLOCK.defaultBlockState() // left empty
+			);
+
+			for (int i = 0; i < pieces.size(); i++) {
+				BlockPos pos = new BlockPos(i * 2 - 6, Y, -10);
+				setBlock(sp, pos, pieces.get(i));
+
+				if (i < pieces.size() - 1) {
+					fill(sp, pos, Blocks.QUARTZ_BLOCK, Blocks.COAL_BLOCK);
+				}
+			}
+
+			for (int x = -6; x <= -4; x++) {
+				for (int z = -13; z <= -12; z++) {
+					BlockPos pos = new BlockPos(x, Y - 1, z);
+					setBlock(sp, pos, VeneerRegistry.CHECKERED_FRAME_BLOCK.defaultBlockState());
+					fill(sp, pos, Blocks.QUARTZ_BLOCK, Blocks.COAL_BLOCK);
+				}
+			}
+
+			assertSlot(sp, new BlockPos(-6, Y, -10), 1, Blocks.COAL_BLOCK);
+			sp.getServer().runCommand("tp @a 0.5 %d -4.5 180 35".formatted(Y + 3));
+			context.waitTicks(10);
+			sp.getConnection().waitForChunksRender();
+			context.waitTicks(10);
+			context.takeScreenshot("veneer_checkered");
+		}
+	}
+
+	/** Checker cells alternate on every axis, and the half-checkered block's solid half is always slot 0. */
+	private static void checkCheckerSlots() {
+		var half = (VeneerHalfCheckeredBlock) VeneerRegistry.HALF_CHECKERED_FRAME_BLOCK;
+		BlockState up = half.defaultBlockState().setValue(VeneerHalfCheckeredBlock.FACING, Direction.UP);
+		BlockState west = half.defaultBlockState().setValue(VeneerHalfCheckeredBlock.FACING, Direction.WEST);
+		var slab = (io.github.trini3.veneer.block.VeneerHolder) VeneerRegistry.CHECKERED_FRAME_SLAB;
+		BlockState topSlab = VeneerRegistry.CHECKERED_FRAME_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP);
+
+		boolean ok = Checker.slot(0.25, 0.25, 0.25) == 0 && Checker.slot(0.75, 0.25, 0.25) == 1
+				&& Checker.slot(0.75, 0.75, 0.25) == 0 && Checker.slot(0.75, 0.75, 0.75) == 1
+				&& half.slotForPoint(up, 0.75F, 0.25F, 0.25F) == 0 // solid bottom half
+				&& half.slotForPoint(up, 0.25F, 0.75F, 0.25F) == 1 && half.slotForPoint(up, 0.75F, 0.75F, 0.25F) == 0
+				&& half.slotForPoint(west, 0.75F, 0.75F, 0.25F) == 0 // solid east half
+				&& half.slotForPoint(west, 0.25F, 0.75F, 0.25F) == 1
+				&& slab.slotForPoint(topSlab, 0.25F, 0.75F, 0.25F) == 1;
+
+		if (!ok) {
+			throw new AssertionError("Checkered slot layout is wrong");
 		}
 	}
 

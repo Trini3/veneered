@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "veneer:block/checkered_frame_slab"
+    },
+    "type=top": {
+      "model": "veneer:block/checkered_frame_slab_top"
+    },
+    "type=double": {
+      "model": "veneer:block/checkered_frame_block"
+    }
+  }
+}

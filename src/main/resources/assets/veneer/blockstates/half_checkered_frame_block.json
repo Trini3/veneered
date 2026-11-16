@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "veneer:block/half_checkered_frame_block_down"
+    },
+    "facing=up": {
+      "model": "veneer:block/half_checkered_frame_block_up"
+    },
+    "facing=north": {
+      "model": "veneer:block/half_checkered_frame_block_north"
+    },
+    "facing=south": {
+      "model": "veneer:block/half_checkered_frame_block_south"
+    },
+    "facing=west": {
+      "model": "veneer:block/half_checkered_frame_block_west"
+    },
+    "facing=east": {
+      "model": "veneer:block/half_checkered_frame_block_east"
+    }
+  }
+}

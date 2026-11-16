@@ -51,6 +51,12 @@ public final class VeneerRegistry {
 	public static final Block FRAME_BUTTON = register("frame_button", p -> new VeneerButtonBlock(BlockSetType.OAK, 30, p), props(Blocks.OAK_BUTTON));
 	public static final Block FRAME_PANE = register("frame_pane", VeneerPaneBlock::new, props(Blocks.OAK_FENCE));
 
+	// Checkered frames: two appearances in a 2x2x2 checkerboard (see Checker).
+	public static final Block CHECKERED_FRAME_BLOCK = register("checkered_frame_block", VeneerCheckeredBlock::new, solidProps(Blocks.OAK_PLANKS));
+	public static final Block HALF_CHECKERED_FRAME_BLOCK = register("half_checkered_frame_block", VeneerHalfCheckeredBlock::new, solidProps(Blocks.OAK_PLANKS));
+	public static final Block CHECKERED_FRAME_SLAB = register("checkered_frame_slab", VeneerCheckeredSlabBlock::new, solidProps(Blocks.OAK_SLAB));
+	public static final Block CHECKERED_FRAME_PANEL = register("checkered_frame_panel", VeneerCheckeredPanelBlock::new, solidProps(Blocks.OAK_SLAB));
+
 	// Glowing frames always give off glowstone-level light, whatever they hold.
 	public static final Block GLOWING_FRAME_BLOCK = register("glowing_frame_block", VeneerFullBlock::new, glowing(solidProps(Blocks.OAK_PLANKS)));
 	public static final Block GLOWING_FRAME_SLAB = register("glowing_frame_slab", VeneerSlabBlock::new, glowing(solidProps(Blocks.OAK_SLAB)));

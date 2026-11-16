@@ -21,5 +21,9 @@
   "block.veneer.frame_pane": "Frame Panel",
   "block.veneer.glowing_frame_block": "Glowing Frame Block",
   "block.veneer.glowing_frame_slab": "Glowing Frame Slab",
-  "block.veneer.glowing_frame_stairs": "Glowing Frame Stairs"
+  "block.veneer.glowing_frame_stairs": "Glowing Frame Stairs",
+  "block.veneer.checkered_frame_block": "Checkered Frame Block",
+  "block.veneer.half_checkered_frame_block": "Half-Checkered Frame Block",
+  "block.veneer.checkered_frame_slab": "Checkered Frame Slab",
+  "block.veneer.checkered_frame_panel": "Checkered Frame Vertical Slab"
 }
