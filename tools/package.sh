@@ -1,7 +1,7 @@
 #!/bin/bash
 # Build the jar, check it matches the source resources, then copy it to project files.
 set -e
-cd /home/user/trinisflavorcontent
+cd "$(dirname "$0")/.."
 export JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
 ./gradlew build -q 2>&1 | grep -v JAVA_TOOL || true
 python3 - <<'PY'
